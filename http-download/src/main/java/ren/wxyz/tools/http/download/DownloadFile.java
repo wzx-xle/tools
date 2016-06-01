@@ -37,6 +37,11 @@ public class DownloadFile {
     private static final int DOWNLOAD_BUFFER_SIZE = 1024 * 1024;
 
     /**
+     * 临时文件后缀
+     */
+    private static final String TMP_FILE_SUFFIX = ".tmp";
+
+    /**
      * 配置类对象
      */
     private Configuration config;
@@ -121,6 +126,7 @@ public class DownloadFile {
     private boolean download(String url, File filePath, ProgressListener progressListener) {
         progressListener.progress(url, 0, "started");
         long startTime = System.currentTimeMillis();
+
         // 创建客户端
         try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
             HttpHost target = HttpHost.create(getRootUrl(url));
@@ -147,25 +153,40 @@ public class DownloadFile {
                 // 读取内容
                 HttpEntity entity = resp.getEntity();
                 if (null != entity) {
+                    // 初始化临时变量
+                    File tmpFile = new File(filePath.getParent(), filePath.getName() + TMP_FILE_SUFFIX);
                     byte[] buffer = new byte[DOWNLOAD_BUFFER_SIZE];
                     int len;
                     try (InputStream is = entity.getContent();
-                            OutputStream os = new FileOutputStream(filePath)) {
+                            OutputStream os = new FileOutputStream(tmpFile)) {
+                        // 读取文件内容
                         while ((len = is.read(buffer)) > 0) {
+                            // 写入到临时文件中
                             os.write(buffer, 0, len);
+
+                            // 更新进度
                             progressListener.progress(url, (int)((currLen += len) * 1.0 / length * 10)
                                     , "ok, time=" + ((System.currentTimeMillis() - startTime) / 1000));
                         }
                         os.flush();
-                        // 处理进度
-                        if (-1L != length && currLen != length) {
-                            progressListener.progress(url, -1, "Content-Length is " + length + ", but actual is " + currLen);
-                        }
-                        else if (-1L == length) {
-                            progressListener.progress(url, 10, "ok, time=" + ((System.currentTimeMillis() - startTime) / 1000));
-                        }
-                        return true;
                     }
+
+                    // 更新异常进度
+                    if (-1L != length && currLen != length) {
+                        progressListener.progress(url, -1, "Content-Length is " + length + ", but actual is " + currLen);
+                        return false;
+                    }
+                    else if (-1L == length) {
+                        progressListener.progress(url, 10, "ok, time=" + ((System.currentTimeMillis() - startTime) / 1000));
+                    }
+
+                    // 重命名文件
+                    if (filePath.exists()) {
+                        filePath.delete();
+                    }
+                    tmpFile.renameTo(filePath);
+
+                    return true;
                 }
             }
         }
