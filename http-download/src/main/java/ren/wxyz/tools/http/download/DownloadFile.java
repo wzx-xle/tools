@@ -1,18 +1,25 @@
 package ren.wxyz.tools.http.download;
 
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.http.Header;
+import org.apache.http.HttpEntity;
 import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.HttpClient;
 import org.apache.http.client.ResponseHandler;
+import org.apache.http.client.config.RequestConfig;
+import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 
-import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
+import java.io.*;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 /**
  * <p>
@@ -25,10 +32,19 @@ import java.util.List;
 public class DownloadFile {
 
     /**
+     * 下载缓冲区大小
+     */
+    private static final int DOWNLOAD_BUFFER_SIZE = 1024 * 1024;
+
+    /**
      * 配置类对象
      */
     private Configuration config;
 
+    /**
+     * 代理配置
+     */
+    private HttpHost proxy;
     /**
      * 以给定配置项加载下载对象
      *
@@ -36,6 +52,9 @@ public class DownloadFile {
      */
     public DownloadFile(Configuration config) {
         this.config = config;
+        if (config.isProxyEnable()) {
+            this.proxy = new HttpHost(config.getProxyHost(), config.getProxyPort(), "http");
+        }
     }
 
     /**
@@ -44,32 +63,157 @@ public class DownloadFile {
      * @param urls URL列表
      */
     public void download(List<String> urls) {
+        final File rootPath = new File(config.getOutputFolder());
+        if (!rootPath.exists()) {
+            System.out.println("创建目录 " + rootPath.getAbsolutePath());
+            rootPath.mkdirs();
+        }
 
+        // 线程池
+        ExecutorService pool = Executors.newFixedThreadPool(config.getDownloadThreadNum());
+
+        List<Future<Boolean>> futures = new ArrayList<>();
+
+        // 循环多线程下载
+        for (final String url : urls) {
+            if (StringUtils.isBlank(url)) {
+                continue;
+            }
+            final File saveFile = new File(rootPath, getFileNameFromUrl(url));
+
+            Future<Boolean> future = pool.submit(() -> download(url, saveFile, progressListener));
+            futures.add(future);
+        }
+
+        // 等待下载完成
+        for (Future<Boolean> future : futures) {
+            try {
+                future.get();
+            }
+            catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        pool.shutdown();
     }
+
+    /**
+     * 统一同一个进度监听器
+     */
+    private ProgressListener progressListener = new ProgressListener() {
+        @Override
+        public void progress(String url, int rate, String msg) {
+            if (rate == 10 || rate == -1) {
+                System.out.println(url + "," + rate + "," + msg);
+            }
+        }
+    };
 
     /**
      * 下载单个文件
      *
      * @param url      URL地址
      * @param filePath 保存文件路径
+     * @param progressListener 进度监听器
+     * @return 下载的状态
      */
-    private void download(String url, String filePath) {
+    private boolean download(String url, File filePath, ProgressListener progressListener) {
+        progressListener.progress(url, 0, "started");
+        long startTime = System.currentTimeMillis();
+        // 创建客户端
         try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
+            HttpHost target = HttpHost.create(getRootUrl(url));
+
+            // 构建GET请求
             HttpGet httpGet = new HttpGet(url);
-
-            byte[] respBody = httpClient.execute(httpGet, new ResponseHandler<byte[]>() {
-                @Override
-                public byte[] handleResponse(HttpResponse httpResponse) throws ClientProtocolException, IOException {
-                    int status = httpResponse.getStatusLine().getStatusCode();
-                    if (status >= 200 && status < 300) {
-
-                    }
-                    return new byte[0];
+            if (config.isProxyEnable()) {
+                RequestConfig config = RequestConfig.custom().setProxy(proxy).build();
+                httpGet.setConfig(config);
+            }
+            // 执行下载
+            try (CloseableHttpResponse resp = httpClient.execute(target, httpGet)) {
+                int statusCode = resp.getStatusLine().getStatusCode();
+                if (statusCode < 200 || statusCode >= 300) {
+                    progressListener.progress(url, -1, "status code is " + statusCode);
                 }
-            });
+                // 文件总长度
+                Header[] respHeader = resp.getHeaders("Content-Length");
+                long length = -1L;
+                if (respHeader.length > 0) {
+                    length = Long.parseLong(respHeader[0].getValue());
+                }
+                long currLen = 0;
+                // 读取内容
+                HttpEntity entity = resp.getEntity();
+                if (null != entity) {
+                    byte[] buffer = new byte[DOWNLOAD_BUFFER_SIZE];
+                    int len;
+                    try (InputStream is = entity.getContent();
+                            OutputStream os = new FileOutputStream(filePath)) {
+                        while ((len = is.read(buffer)) > 0) {
+                            os.write(buffer, 0, len);
+                            progressListener.progress(url, (int)((currLen += len) * 1.0 / length * 10)
+                                    , "ok, time=" + ((System.currentTimeMillis() - startTime) / 1000));
+                        }
+                        os.flush();
+                        // 处理进度
+                        if (-1L != length && currLen != length) {
+                            progressListener.progress(url, -1, "Content-Length is " + length + ", but actual is " + currLen);
+                        }
+                        else if (-1L == length) {
+                            progressListener.progress(url, 10, "ok, time=" + ((System.currentTimeMillis() - startTime) / 1000));
+                        }
+                        return true;
+                    }
+                }
+            }
         }
-        catch (IOException e) {
-            e.printStackTrace();
+        catch (Exception e) {
+            progressListener.progress(url, -1, "exception type is " + e.getClass() + ", msg is " + e.getMessage());
         }
+
+        return false;
+    }
+
+    /**
+     * 从URL中得到文件名
+     * @param url URL
+     * @return 文件名
+     */
+    private String getFileNameFromUrl(String url) {
+        if (null != url) {
+            int beginIdx = url.lastIndexOf("/") + 1;
+            if (beginIdx > 0) {
+                int endIdx = url.indexOf("?", beginIdx);
+                if (endIdx < 0) {
+                    endIdx = url.length();
+                }
+                return url.substring(beginIdx, endIdx);
+            }
+        }
+
+        return "";
+    }
+
+    /**
+     * 从URL提取根URL
+     * @param url URL
+     * @return 根URL
+     */
+    private String getRootUrl(String url) {
+        if (null != url) {
+            int beginIdx = url.indexOf("://");
+            if (beginIdx > 0) {
+                int endIdx = url.indexOf("/", beginIdx + 3);
+                if (endIdx < 0) {
+                    endIdx = url.length();
+                }
+
+                return url.substring(0, endIdx);
+            }
+        }
+
+        return url;
     }
 }

@@ -47,6 +47,11 @@ public class Configuration {
     public static final String OUTPUT_FOLDER = "app.output.folder";
 
     /**
+     * 下载线程数的参数名
+     */
+    public static final String DOWNLOAD_THREAD_NUM = "app.download.thread";
+
+    /**
      * 加载属性配置
      */
     public void load(Properties props) {
@@ -58,6 +63,7 @@ public class Configuration {
         // 加载应用配置
         this.setUrlsFile(props.getProperty(URLS_FILE, ""));
         this.setOutputFolder(props.getProperty(OUTPUT_FOLDER, ""));
+        this.setDownloadThreadNum(Integer.parseInt(props.getProperty(DOWNLOAD_THREAD_NUM, "1")));
     }
 
     /**
@@ -65,7 +71,7 @@ public class Configuration {
      */
     public void loadDefault() {
         // 类路径
-        String classPath = Configuration.class.getClassLoader().getResource("/").getPath();
+        String classPath = Configuration.class.getResource("/").getPath();
 
         // 读取配置文件
         try {
@@ -119,4 +125,9 @@ public class Configuration {
      * 下载文件的文件夹
      */
     private String outputFolder;
+
+    /**
+     * 下载线程数
+     */
+    private int downloadThreadNum;
 }

@@ -25,14 +25,16 @@ public class App {
     private static final Configuration config = new Configuration();
 
     public static void main(String[] args) {
-        System.out.println("Hello World!");
-
+        System.out.println("程序启动，正在读取配置...");
         int code = cli(args);
         switch (code) {
             case 1:
+                System.out.print("正在加载下载列表... ");
                 DownloadFile downloading = new DownloadFile(config);
                 try {
-                    List<String> urls = FileUtils.readLines(new File(config.getUrlsFile()), "utf-8");
+                    List<String> urls = FileUtils.readLines(
+                            new File(Configuration.class.getResource("/").getPath(), config.getUrlsFile()), "utf-8");
+                    System.out.println("共有" + urls.size() + "文件。");
                     downloading.download(urls);
                 }
                 catch (IOException e) {
@@ -63,45 +65,39 @@ public class App {
         try {
             CommandLine cmd = parser.parse(opts, args, false);
             HelpFormatter hf = new HelpFormatter();
-            // 没有带参数，则结束
-            while (cmd.getOptions().length > 0) {
-                if (cmd.hasOption("h")) {
-                    break;
+            // 帮助
+            if (cmd.hasOption("h")) {
+                hf.printHelp("http-download", opts);
+            }
+            // 程序版本
+            else if (cmd.hasOption("v")) {
+                System.out.println("version is " + APP_VERISON);
+            }
+            else {
+                // 配置文件
+                if (cmd.hasOption('c')) {
+                    String configFile = cmd.getOptionValue('c');
+                    config.loadFile(new File(configFile));
                 }
                 else {
-                    // 功能性选型
-                    if (cmd.hasOption("v")) {
-                        System.out.println("version is " + APP_VERISON);
-                    }
-                    else {
-                        // 配置文件
-                        if (cmd.hasOption('c')) {
-                            String configFile = cmd.getOptionValue('c');
-                            config.loadFile(new File(configFile));
-                        }
-                        else {
-                            config.loadDefault();
-                        }
-
-                        // 需要下载的文件列表的文件
-                        if (cmd.hasOption('f')) {
-                            String urlsFile = cmd.getOptionValue('f');
-                            config.setUrlsFile(urlsFile);
-                        }
-                        else {
-                            if (StringUtils.isBlank(config.getUrlsFile())) {
-                                throw new FileNotFoundException("需要下载的文件列表的文件找不到！");
-                            }
-                        }
-
-                        statusCode = 1;
-                    }
-
-                    return statusCode;
+                    config.loadDefault();
+                    System.out.println("使用默认的配置文件！");
                 }
-            }
 
-            hf.printHelp("http-download", opts);
+                // 需要下载的文件列表的文件
+                if (cmd.hasOption('f')) {
+                    String urlsFile = cmd.getOptionValue('f');
+                    config.setUrlsFile(urlsFile);
+                }
+                else {
+                    if (StringUtils.isBlank(config.getUrlsFile())) {
+                        throw new FileNotFoundException("需要下载的文件列表的文件找不到！");
+                    }
+                }
+                System.out.println("文件输出目录是 " + config.getOutputFolder());
+
+                statusCode = 1;
+            }
         }
         catch (FileNotFoundException e) {
             e.printStackTrace();
