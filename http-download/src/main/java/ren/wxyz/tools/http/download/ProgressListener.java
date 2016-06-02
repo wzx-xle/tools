@@ -13,8 +13,7 @@ public interface ProgressListener {
     /**
      * 更新进度
      * @param url URL地址
-     * @param rate 进度十分值
-     * @param msg 消息
+     * @param rate 进度百分值
      */
-    void progress(String url, int rate, String msg);
+    void progress(String url, int rate);
 }

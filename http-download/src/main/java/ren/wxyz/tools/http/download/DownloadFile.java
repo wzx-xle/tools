@@ -1,5 +1,7 @@
 package ren.wxyz.tools.http.download;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.Header;
@@ -16,10 +18,13 @@ import org.apache.http.impl.client.HttpClients;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.LockSupport;
 
 /**
  * <p>
@@ -50,6 +55,12 @@ public class DownloadFile {
      * 代理配置
      */
     private HttpHost proxy;
+
+    /**
+     * 文件保存根目录
+     */
+    private File rootPath;
+
     /**
      * 以给定配置项加载下载对象
      *
@@ -68,16 +79,54 @@ public class DownloadFile {
      * @param urls URL列表
      */
     public void download(List<String> urls) {
-        final File rootPath = new File(config.getOutputFolder());
+        File rootPath = new File(config.getOutputFolder());
         if (!rootPath.exists()) {
             System.out.println("创建目录 " + rootPath.getAbsolutePath());
             rootPath.mkdirs();
         }
+        this.rootPath = rootPath;
 
+        List<Status> resList = mutiThreadDownload(urls, config.getDownloadThreadNum(), progressListener);
+
+        // 找出网络出错的URL
+        List<String> reDownloadList = new ArrayList<>();
+        for (Status status : resList) {
+            switch (status.getCode()) {
+                case Status.OK:
+                    System.out.println("ok: " + status.getUrl() + ", time: " + status.getTimeOfSecond());
+                    break;
+                case Status.HTTP_ERROR:
+                    System.out.println("fail: " + status.getUrl() + ", httpCode: " + status.getHttpCode());
+                    break;
+                case Status.NET_ERROR:
+                case Status.SYS_ERROR:
+                    System.out.println("fail: " + status.getUrl() + ", msg: " + status.getMsg());
+                    reDownloadList.add(status.getUrl());
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        // 重新下载
+        mutiThreadDownload(reDownloadList, config.getDownloadThreadNum(), progressListener);
+    }
+
+    /**
+     * 多线程下载
+     * @param urls URL地址
+     * @param ThreadNum 线程数
+     * @param progressListener 进度监听器
+     * @return 文件状态列表
+     */
+    private List<Status> mutiThreadDownload(List<String> urls, int ThreadNum, ProgressListener progressListener) {
         // 线程池
-        ExecutorService pool = Executors.newFixedThreadPool(config.getDownloadThreadNum());
+        ExecutorService pool = Executors.newFixedThreadPool(ThreadNum);
 
-        List<Future<Boolean>> futures = new ArrayList<>();
+        // 下载线程句柄列表
+        List<Future<Status>> futures = new ArrayList<>();
+        // 下载状态列表
+        List<Status> resList = new ArrayList<>();
 
         // 循环多线程下载
         for (final String url : urls) {
@@ -86,21 +135,24 @@ public class DownloadFile {
             }
             final File saveFile = new File(rootPath, getFileNameFromUrl(url));
 
-            Future<Boolean> future = pool.submit(() -> download(url, saveFile, progressListener));
+            Future<Status> future = pool.submit(() -> download(url, saveFile, progressListener));
             futures.add(future);
         }
 
         // 等待下载完成
-        for (Future<Boolean> future : futures) {
+        for (Future<Status> future : futures) {
             try {
-                future.get();
+                resList.add(future.get());
             }
             catch (Exception e) {
                 e.printStackTrace();
             }
         }
 
+        // 关闭线程池
         pool.shutdown();
+
+        return resList;
     }
 
     /**
@@ -108,9 +160,9 @@ public class DownloadFile {
      */
     private ProgressListener progressListener = new ProgressListener() {
         @Override
-        public void progress(String url, int rate, String msg) {
-            if (rate == 10 || rate == -1) {
-                System.out.println(url + "," + rate + "," + msg);
+        public void progress(String url, int rate) {
+            if (rate % 10 == 0) {
+                System.out.println(url + "," + rate);
             }
         }
     };
@@ -123,8 +175,10 @@ public class DownloadFile {
      * @param progressListener 进度监听器
      * @return 下载的状态
      */
-    private boolean download(String url, File filePath, ProgressListener progressListener) {
-        progressListener.progress(url, 0, "started");
+    private Status download(String url, File filePath, ProgressListener progressListener) {
+        Status status = new Status(Status.OK, url, filePath);
+
+        progressListener.progress(url, 0);
         long startTime = System.currentTimeMillis();
 
         // 创建客户端
@@ -141,19 +195,26 @@ public class DownloadFile {
             try (CloseableHttpResponse resp = httpClient.execute(target, httpGet)) {
                 int statusCode = resp.getStatusLine().getStatusCode();
                 if (statusCode < 200 || statusCode >= 300) {
-                    progressListener.progress(url, -1, "status code is " + statusCode);
+                    progressListener.progress(url, -1);
+                    status.setCode(Status.HTTP_ERROR, statusCode);
+
+                    status.setTimeOfSecond(System.currentTimeMillis() - startTime);
+                    return status;
                 }
+                status.setHttpCode(statusCode);
+
                 // 文件总长度
                 Header[] respHeader = resp.getHeaders("Content-Length");
                 long length = -1L;
                 if (respHeader.length > 0) {
                     length = Long.parseLong(respHeader[0].getValue());
                 }
-                long currLen = 0;
+
                 // 读取内容
                 HttpEntity entity = resp.getEntity();
                 if (null != entity) {
                     // 初始化临时变量
+                    long currLen = 0;
                     File tmpFile = new File(filePath.getParent(), filePath.getName() + TMP_FILE_SUFFIX);
                     byte[] buffer = new byte[DOWNLOAD_BUFFER_SIZE];
                     int len;
@@ -165,19 +226,22 @@ public class DownloadFile {
                             os.write(buffer, 0, len);
 
                             // 更新进度
-                            progressListener.progress(url, (int)((currLen += len) * 1.0 / length * 10)
-                                    , "ok, time=" + ((System.currentTimeMillis() - startTime) / 1000));
+                            progressListener.progress(url, (int)((currLen += len) * 1.0 / length * 100));
                         }
                         os.flush();
                     }
 
                     // 更新异常进度
                     if (-1L != length && currLen != length) {
-                        progressListener.progress(url, -1, "Content-Length is " + length + ", but actual is " + currLen);
-                        return false;
+                        progressListener.progress(url, -1);
+                        status.setCode(Status.SYS_ERROR);
+                        status.setMsg("Content-Length is " + length + ", but actual is " + currLen);
+
+                        status.setTimeOfSecond(System.currentTimeMillis() - startTime);
+                        return status;
                     }
                     else if (-1L == length) {
-                        progressListener.progress(url, 10, "ok, time=" + ((System.currentTimeMillis() - startTime) / 1000));
+                        progressListener.progress(url, 100);
                     }
 
                     // 重命名文件
@@ -186,15 +250,19 @@ public class DownloadFile {
                     }
                     tmpFile.renameTo(filePath);
 
-                    return true;
+                    status.setTimeOfSecond(System.currentTimeMillis() - startTime);
+                    return status;
                 }
             }
         }
         catch (Exception e) {
-            progressListener.progress(url, -1, "exception type is " + e.getClass() + ", msg is " + e.getMessage());
+            progressListener.progress(url, -1);
+            status.setCode(Status.NET_ERROR, e);
+            status.setMsg("exception type is " + e.getClass() + ", msg is " + e.getMessage());
         }
 
-        return false;
+        status.setTimeOfSecond(System.currentTimeMillis() - startTime);
+        return status;
     }
 
     /**
@@ -236,5 +304,98 @@ public class DownloadFile {
         }
 
         return url;
+    }
+
+    /**
+     * 下载状态类
+     */
+    @Getter
+    @Setter
+    private static class Status {
+        /**
+         * OK
+         */
+        public static final int OK = 0x00;
+
+        /**
+         * HTTP错误
+         */
+        public static final int HTTP_ERROR = 0x01;
+
+        /**
+         * 网络错误
+         */
+        public static final int NET_ERROR = 0x02;
+
+        /**
+         * 系统错误
+         */
+        public static final int SYS_ERROR = 0x03;
+
+        /**
+         * 通过三个必须的参数初始化对象
+         * @param code 状态码
+         * @param url 下载的URL
+         * @param filePath 保存的路径
+         */
+        public Status(int code, String url, File filePath) {
+            this.setCode(code);
+            this.setUrl(url);
+            this.setFilePath(filePath);
+        }
+        /**
+         * 状态码
+         */
+        private int code;
+
+        /**
+         * 消息
+         */
+        private String msg;
+
+        /**
+         * 下载的URL
+         */
+        private String url;
+
+        /**
+         * 文件的保存路径
+         */
+        private File filePath;
+
+        /**
+         * HTTP的返回状态码
+         */
+        private int httpCode;
+
+        /**
+         * 异常
+         */
+        private Exception exception;
+
+        /**
+         * 秒级时间
+         */
+        private long timeOfSecond;
+
+        /**
+         * 设置状态码，并同时设置HTTP状态码
+         * @param code 状态码
+         * @param httpCode HTTP状态吗
+         */
+        public void setCode(int code, int httpCode) {
+            this.setCode(code);
+            this.setHttpCode(httpCode);
+        }
+
+        /**
+         * 设置状态码，并同时设置异常
+         * @param code 状态码
+         * @param exception 异常
+         */
+        public void setCode(int code, Exception exception) {
+            this.setCode(code);
+            this.setException(exception);
+        }
     }
 }
