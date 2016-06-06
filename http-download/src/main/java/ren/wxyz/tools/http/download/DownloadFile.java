@@ -110,6 +110,22 @@ public class DownloadFile {
 
         // 重新下载
         mutiThreadDownload(reDownloadList, config.getDownloadThreadNum(), progressListener);
+        for (Status status : resList) {
+            switch (status.getCode()) {
+                case Status.OK:
+                    System.out.println("ok: " + status.getUrl() + ", time: " + status.getTimeOfSecond());
+                    break;
+                case Status.HTTP_ERROR:
+                    System.out.println("fail: " + status.getUrl() + ", httpCode: " + status.getHttpCode());
+                    break;
+                case Status.NET_ERROR:
+                case Status.SYS_ERROR:
+                    System.out.println("fail: " + status.getUrl() + ", msg: " + status.getMsg());
+                    break;
+                default:
+                    break;
+            }
+        }
     }
 
     /**
@@ -161,7 +177,7 @@ public class DownloadFile {
     private ProgressListener progressListener = new ProgressListener() {
         @Override
         public void progress(String url, int rate) {
-            if (rate % 10 == 0) {
+            if (100 == rate) {
                 System.out.println(url + "," + rate);
             }
         }
