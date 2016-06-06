@@ -243,6 +243,10 @@ public class DownloadFile {
 
                             // 更新进度
                             progressListener.progress(url, (int)((currLen += len) * 1.0 / length * 100));
+
+                            if (currLen % (DOWNLOAD_BUFFER_SIZE * 3) == 0) {
+                                os.flush();
+                            }
                         }
                         os.flush();
                     }
