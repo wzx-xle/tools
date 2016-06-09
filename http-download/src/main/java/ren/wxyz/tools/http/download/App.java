@@ -33,7 +33,7 @@ public class App {
                 DownloadFile downloading = new DownloadFile(config);
                 try {
                     List<String> urls = FileUtils.readLines(
-                            new File(Configuration.class.getResource("/").getPath(), config.getUrlsFile()), "utf-8");
+                            new File(config.getCurrPath(), config.getUrlsFile()), "utf-8");
                     System.out.println("共有" + urls.size() + "文件。");
                     downloading.download(urls);
                 }

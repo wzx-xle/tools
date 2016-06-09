@@ -5,6 +5,8 @@ import lombok.Setter;
 import org.apache.commons.io.FileUtils;
 
 import java.io.*;
+import java.net.URI;
+import java.net.URL;
 import java.util.Properties;
 
 /**
@@ -71,7 +73,7 @@ public class Configuration {
      */
     public void loadDefault() {
         // 类路径
-        String classPath = Configuration.class.getResource("/").getPath();
+        String classPath = getCurrPath();
 
         // 读取配置文件
         try {
@@ -99,6 +101,23 @@ public class Configuration {
         catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    /**
+     * 获取当前路径
+     * @return 路径字符串
+     */
+    public String getCurrPath() {
+        String currPath;
+        URL url = Configuration.class.getResource("/");
+        if (null != url) {
+            currPath = url.getPath();
+        }
+        else {
+            currPath = ".";
+        }
+
+        return currPath;
     }
 
     /**

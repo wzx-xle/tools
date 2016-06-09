@@ -2,29 +2,28 @@ package ren.wxyz.tools.http.download;
 
 import lombok.Getter;
 import lombok.Setter;
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHost;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.LockSupport;
 
 /**
  * <p>
@@ -79,7 +78,7 @@ public class DownloadFile {
      * @param urls URL列表
      */
     public void download(List<String> urls) {
-        File rootPath = new File(config.getOutputFolder());
+        File rootPath = new File(computeExpression(config.getOutputFolder()));
         if (!rootPath.exists()) {
             System.out.println("创建目录 " + rootPath.getAbsolutePath());
             rootPath.mkdirs();
@@ -109,7 +108,7 @@ public class DownloadFile {
         }
 
         // 重新下载
-        mutiThreadDownload(reDownloadList, config.getDownloadThreadNum(), progressListener);
+        resList = mutiThreadDownload(reDownloadList, config.getDownloadThreadNum(), progressListener);
         for (Status status : resList) {
             switch (status.getCode()) {
                 case Status.OK:
@@ -130,8 +129,9 @@ public class DownloadFile {
 
     /**
      * 多线程下载
-     * @param urls URL地址
-     * @param ThreadNum 线程数
+     *
+     * @param urls             URL地址
+     * @param ThreadNum        线程数
      * @param progressListener 进度监听器
      * @return 文件状态列表
      */
@@ -159,8 +159,7 @@ public class DownloadFile {
         for (Future<Status> future : futures) {
             try {
                 resList.add(future.get());
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }
@@ -186,8 +185,8 @@ public class DownloadFile {
     /**
      * 下载单个文件
      *
-     * @param url      URL地址
-     * @param filePath 保存文件路径
+     * @param url              URL地址
+     * @param filePath         保存文件路径
      * @param progressListener 进度监听器
      * @return 下载的状态
      */
@@ -235,14 +234,14 @@ public class DownloadFile {
                     byte[] buffer = new byte[DOWNLOAD_BUFFER_SIZE];
                     int len;
                     try (InputStream is = entity.getContent();
-                            OutputStream os = new FileOutputStream(tmpFile)) {
+                         OutputStream os = new FileOutputStream(tmpFile)) {
                         // 读取文件内容
                         while ((len = is.read(buffer)) > 0) {
                             // 写入到临时文件中
                             os.write(buffer, 0, len);
 
                             // 更新进度
-                            progressListener.progress(url, (int)((currLen += len) * 1.0 / length * 100));
+                            progressListener.progress(url, (int) ((currLen += len) * 1.0 / length * 100));
 
                             if (currLen % (DOWNLOAD_BUFFER_SIZE * 3) == 0) {
                                 os.flush();
@@ -259,8 +258,7 @@ public class DownloadFile {
 
                         status.setTimeOfSecond(System.currentTimeMillis() - startTime);
                         return status;
-                    }
-                    else if (-1L == length) {
+                    } else if (-1L == length) {
                         progressListener.progress(url, 100);
                     }
 
@@ -274,8 +272,7 @@ public class DownloadFile {
                     return status;
                 }
             }
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             progressListener.progress(url, -1);
             status.setCode(Status.NET_ERROR, e);
             status.setMsg("exception type is " + e.getClass() + ", msg is " + e.getMessage());
@@ -287,6 +284,7 @@ public class DownloadFile {
 
     /**
      * 从URL中得到文件名
+     *
      * @param url URL
      * @return 文件名
      */
@@ -307,6 +305,7 @@ public class DownloadFile {
 
     /**
      * 从URL提取根URL
+     *
      * @param url URL
      * @return 根URL
      */
@@ -324,6 +323,24 @@ public class DownloadFile {
         }
 
         return url;
+    }
+
+    /**
+     * 表达式date
+     */
+    private static final String EXP_DATE = ":date:";
+
+    /**
+     * 计算文件路径的表达式，当前仅支持:date:
+     * @param filePath 文件路径
+     * @return
+     */
+    private String computeExpression(String filePath) {
+        if (filePath.contains(EXP_DATE)) {
+            String val = new SimpleDateFormat("YYYYMMdd").format(new Date());
+            return filePath.replace(EXP_DATE, val);
+        }
+        return filePath;
     }
 
     /**
@@ -354,8 +371,9 @@ public class DownloadFile {
 
         /**
          * 通过三个必须的参数初始化对象
-         * @param code 状态码
-         * @param url 下载的URL
+         *
+         * @param code     状态码
+         * @param url      下载的URL
          * @param filePath 保存的路径
          */
         public Status(int code, String url, File filePath) {
@@ -363,6 +381,7 @@ public class DownloadFile {
             this.setUrl(url);
             this.setFilePath(filePath);
         }
+
         /**
          * 状态码
          */
@@ -400,7 +419,8 @@ public class DownloadFile {
 
         /**
          * 设置状态码，并同时设置HTTP状态码
-         * @param code 状态码
+         *
+         * @param code     状态码
          * @param httpCode HTTP状态吗
          */
         public void setCode(int code, int httpCode) {
@@ -410,7 +430,8 @@ public class DownloadFile {
 
         /**
          * 设置状态码，并同时设置异常
-         * @param code 状态码
+         *
+         * @param code      状态码
          * @param exception 异常
          */
         public void setCode(int code, Exception exception) {
