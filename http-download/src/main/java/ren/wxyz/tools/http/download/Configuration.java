@@ -2,10 +2,8 @@ package ren.wxyz.tools.http.download;
 
 import lombok.Getter;
 import lombok.Setter;
-import org.apache.commons.io.FileUtils;
 
 import java.io.*;
-import java.net.URI;
 import java.net.URL;
 import java.util.Properties;
 
