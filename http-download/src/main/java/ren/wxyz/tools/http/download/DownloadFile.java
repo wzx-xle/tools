@@ -2,6 +2,7 @@ package ren.wxyz.tools.http.download;
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
@@ -32,6 +33,7 @@ import java.util.concurrent.Future;
  * @author wxyz
  * @datetime 2016/5/31 23:14
  */
+@Slf4j
 public class DownloadFile {
 
     /**
@@ -79,7 +81,7 @@ public class DownloadFile {
     public void download(List<String> urls) {
         File rootPath = new File(computeExpression(config.getOutputFolder()));
         if (!rootPath.exists()) {
-            System.out.println("创建目录 " + rootPath.getAbsolutePath());
+            log.info("创建目录 {}", rootPath.getAbsolutePath());
             rootPath.mkdirs();
         }
         this.rootPath = rootPath;
@@ -91,14 +93,14 @@ public class DownloadFile {
         for (Status status : resList) {
             switch (status.getCode()) {
                 case Status.OK:
-                    System.out.println("ok: " + status.getUrl() + ", time: " + status.getTimeOfSecond());
+                    log.info("{}, time: {}", status.getUrl(), status.getTimeOfSecond());
                     break;
                 case Status.HTTP_ERROR:
-                    System.out.println("fail: " + status.getUrl() + ", httpCode: " + status.getHttpCode());
+                    log.error("{}, httpCode: {}", status.getUrl(), status.getHttpCode());
                     break;
                 case Status.NET_ERROR:
                 case Status.SYS_ERROR:
-                    System.out.println("fail: " + status.getUrl() + ", msg: " + status.getMsg());
+                    log.error("{}, msg: {}", status.getUrl(), status.getMsg());
                     reDownloadList.add(status.getUrl());
                     break;
                 default:
@@ -111,14 +113,15 @@ public class DownloadFile {
         for (Status status : resList) {
             switch (status.getCode()) {
                 case Status.OK:
-                    System.out.println("ok: " + status.getUrl() + ", time: " + status.getTimeOfSecond());
+                    log.info("{}, time: {}", status.getUrl(), status.getTimeOfSecond());
                     break;
                 case Status.HTTP_ERROR:
-                    System.out.println("fail: " + status.getUrl() + ", httpCode: " + status.getHttpCode());
+                    log.error("{}, httpCode: {}", status.getUrl(), status.getHttpCode());
                     break;
                 case Status.NET_ERROR:
                 case Status.SYS_ERROR:
-                    System.out.println("fail: " + status.getUrl() + ", msg: " + status.getMsg());
+                    log.error("{}, msg: {}", status.getUrl(), status.getMsg());
+                    reDownloadList.add(status.getUrl());
                     break;
                 default:
                     break;
@@ -176,7 +179,7 @@ public class DownloadFile {
         @Override
         public void progress(String url, int rate) {
             if (100 == rate) {
-                System.out.println(url + "," + rate);
+                log.debug("{}, {}", url, rate);
             }
         }
     };

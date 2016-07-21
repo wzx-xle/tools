@@ -1,19 +1,19 @@
 package ren.wxyz.tools.http.download;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
-import static org.junit.Assert.assertTrue;
-
 /**
- * Unit test for simple App.
+ * 测试启动类
+ *
+ * @author wxyz
+ * @since 0.1
  */
 public class AppTest {
 
-    /**
-     * Rigourous Test :-)
-     */
+    @Ignore
     @Test
-    public void testApp() {
-        assertTrue(true);
+    public void testMain() throws Exception {
+        App.main(new String[]{});
     }
 }

@@ -1,5 +1,6 @@
 package ren.wxyz.tools.http.download;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.cli.*;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -12,6 +13,7 @@ import java.util.List;
 /**
  * 入口类
  */
+@Slf4j
 public class App {
 
     /**
@@ -25,20 +27,22 @@ public class App {
     private static final Configuration config = new Configuration();
 
     public static void main(String[] args) {
-        System.out.println("程序启动，正在读取配置...");
         int code = cli(args);
         switch (code) {
             case 1:
-                System.out.print("正在加载下载列表... ");
+                log.info("加载下载文件列表 {}", config.getUrlsFile());
                 DownloadFile downloading = new DownloadFile(config);
                 try {
                     List<String> urls = FileUtils.readLines(
                             new File(config.getCurrPath(), config.getUrlsFile()), "utf-8");
-                    System.out.println("共有" + urls.size() + "文件。");
-                    downloading.download(urls);
+                    log.info("共有 {} 文件", urls.size());
+                    if (urls.size() > 0) {
+                        downloading.download(urls);
+                    }
                 }
                 catch (IOException e) {
                     e.printStackTrace();
+                    log.error("下载异常", e);
                 }
                 break;
             default:
@@ -78,10 +82,11 @@ public class App {
                 if (cmd.hasOption('c')) {
                     String configFile = cmd.getOptionValue('c');
                     config.loadFile(new File(configFile));
+                    log.info("使用执行的配置文件 {}", configFile);
                 }
                 else {
                     config.loadDefault();
-                    System.out.println("使用默认的配置文件！");
+                    log.info("使用默认的配置文件 {}", Configuration.DEFAULT_CONFIGUATION_FILE);
                 }
 
                 // 需要下载的文件列表的文件
@@ -94,16 +99,17 @@ public class App {
                         throw new FileNotFoundException("需要下载的文件列表的文件找不到！");
                     }
                 }
-                System.out.println("文件输出目录是 " + config.getOutputFolder());
 
                 statusCode = 1;
             }
         }
         catch (FileNotFoundException e) {
             e.printStackTrace();
+            log.warn("找不到下载文件列表", e);
         }
         catch (ParseException e) {
             e.printStackTrace();
+            log.warn("参数解析错误", e);
         }
 
         return statusCode;
