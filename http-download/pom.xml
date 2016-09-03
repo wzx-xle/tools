@@ -7,6 +7,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
+    <groupId>ren.wxyz.tool</groupId>
     <artifactId>http-download</artifactId>
     <version>0.1</version>
     <packaging>jar</packaging>
