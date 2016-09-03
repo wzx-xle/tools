@@ -36,6 +36,7 @@
 
     <modules>
         <module>http-download</module>
+        <module>data-sync</module>
     </modules>
 
     <properties>
@@ -51,6 +52,7 @@
         <commons-io.version>2.5</commons-io.version>
 
         <httpclient.version>4.5.2</httpclient.version>
+        <xstream.version>1.4.9</xstream.version>
 
         <lombok.version>1.16.6</lombok.version>
         <slf4j.version>1.7.7</slf4j.version>
@@ -124,6 +126,14 @@
                 <version>${slf4j.version}</version>
             </dependency>
             <!-- logger end -->
+
+            <!-- xml parser start -->
+            <dependency>
+                <groupId>com.thoughtworks.xstream</groupId>
+                <artifactId>xstream</artifactId>
+                <version>${xstream.version}</version>
+            </dependency>
+            <!-- xml parser end -->
         </dependencies>
     </dependencyManagement>
 
