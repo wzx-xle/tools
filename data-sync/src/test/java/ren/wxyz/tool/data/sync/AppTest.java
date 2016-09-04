@@ -1,4 +1,4 @@
-package ren.wxyz.tool.compare.copy;
+package ren.wxyz.tool.data.sync;
 
 import junit.framework.Test;
 import junit.framework.TestCase;

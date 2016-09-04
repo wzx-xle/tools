@@ -4,13 +4,16 @@
  * This program can be distributed under the terms of the GNU GPL Version 2.
  * See the file LICENSE.
  */
-package ren.wxyz.tool.compare.copy.config;
+package ren.wxyz.tool.data.sync;
 
 /**
- * 配置类
+ * 入口类
  *
  * @author wxyz 2016-09-03_09:43
  * @since 1.0
  */
-public class Configuration {
+public class App {
+    public static void main(String[] args) {
+        System.out.println("Hello World!");
+    }
 }
