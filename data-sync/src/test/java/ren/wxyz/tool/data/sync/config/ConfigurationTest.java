@@ -8,7 +8,6 @@ package ren.wxyz.tool.data.sync.config;
 
 import org.junit.Test;
 
-import java.io.File;
 import java.util.List;
 
 import static org.junit.Assert.*;

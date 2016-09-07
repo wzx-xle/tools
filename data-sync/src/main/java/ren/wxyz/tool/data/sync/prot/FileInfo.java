@@ -19,15 +19,73 @@ import java.util.Date;
 @Data
 public class FileInfo {
 
+    /**
+     * 文件名
+     */
     private String filename;
 
-    private String fileType;
+    /**
+     * 文件类型
+     */
+    private Type fileType;
 
+    /**
+     * 文件大小
+     */
+    private long fileSize;
+
+    /**
+     * 绝对路径
+     */
     private String absolutePath;
 
+    /**
+     * 相对路径
+     */
     private String relativePath;
 
+    /**
+     * 修改时间
+     */
     private Date modifyDate;
 
-    private Date createDate;
+    /**
+     * 文件类型
+     */
+    public enum Type {
+        /**
+         * 目录文件
+         */
+        DIR,
+
+        /**
+         * 连接文件
+         */
+        LNK,
+
+        /**
+         * 普通文件
+         */
+        REG,
+
+        /**
+         * 字符设备
+         */
+        CHR,
+
+        /**
+         * 块设备
+         */
+        BLK,
+
+        /**
+         * 管道
+         */
+        FIFO,
+
+        /**
+         * 套接字
+         */
+        SOCK
+    }
 }
