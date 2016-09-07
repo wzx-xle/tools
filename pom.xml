@@ -37,6 +37,7 @@
     <modules>
         <module>http-download</module>
         <module>data-sync</module>
+        <module>common-utils</module>
     </modules>
 
     <properties>
@@ -58,10 +59,18 @@
         <lombok.version>1.16.6</lombok.version>
         <slf4j.version>1.7.7</slf4j.version>
         <log4j.version>1.2.17</log4j.version>
+
+        <common-utils.versino>1.0</common-utils.versino>
     </properties>
 
     <dependencyManagement>
         <dependencies>
+            <dependency>
+                <groupId>ren.wxyz.tool</groupId>
+                <artifactId>common-utils</artifactId>
+                <version>${common-utils.versino}</version>
+            </dependency>
+
             <dependency>
                 <groupId>junit</groupId>
                 <artifactId>junit</artifactId>
@@ -147,6 +156,11 @@
     </dependencyManagement>
 
     <dependencies>
+        <dependency>
+            <groupId>ren.wxyz.tool</groupId>
+            <artifactId>common-utils</artifactId>
+        </dependency>
+
         <!-- unit test -->
         <dependency>
             <groupId>junit</groupId>
