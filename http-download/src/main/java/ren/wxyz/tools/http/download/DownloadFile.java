@@ -21,6 +21,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -137,7 +138,7 @@ public class DownloadFile {
      * @param progressListener 进度监听器
      * @return 文件状态列表
      */
-    private List<Status> mutiThreadDownload(List<String> urls, int ThreadNum, ProgressListener progressListener) {
+    private List<Status> mutiThreadDownload(List<String> urls, int ThreadNum, final ProgressListener progressListener) {
         // 线程池
         ExecutorService pool = Executors.newFixedThreadPool(ThreadNum);
 
@@ -153,7 +154,12 @@ public class DownloadFile {
             }
             final File saveFile = new File(rootPath, getFileNameFromUrl(url));
 
-            Future<Status> future = pool.submit(() -> download(url, saveFile, progressListener));
+            Future<Status> future = pool.submit(new Callable<Status>() {
+                @Override
+                public Status call() throws Exception {
+                    return download(url, saveFile, progressListener);
+                }
+            });
             futures.add(future);
         }
 

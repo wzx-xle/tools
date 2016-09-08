@@ -42,7 +42,7 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <java.version>8</java.version>
+        <java.version>1.7</java.version>
 
         <junit.version>4.11</junit.version>
         <jsoup.version>1.8.3</jsoup.version>
@@ -156,11 +156,6 @@
     </dependencyManagement>
 
     <dependencies>
-        <dependency>
-            <groupId>ren.wxyz.tool</groupId>
-            <artifactId>common-utils</artifactId>
-        </dependency>
-
         <!-- unit test -->
         <dependency>
             <groupId>junit</groupId>

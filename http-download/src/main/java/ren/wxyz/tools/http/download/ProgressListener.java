@@ -8,7 +8,6 @@ package ren.wxyz.tools.http.download;
  * @author wxyz
  * @datetime 2016/6/1 22:08
  */
-@FunctionalInterface
 public interface ProgressListener {
     /**
      * 更新进度
