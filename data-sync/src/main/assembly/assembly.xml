@@ -18,7 +18,7 @@
         </fileSet>
         <fileSet>
             <directory>src/main/scripts</directory>
-            <outputDirectory>/bin</outputDirectory>
+            <outputDirectory>/</outputDirectory>
             <includes>
                 <include>run.bat</include>
                 <include>run.sh</include>

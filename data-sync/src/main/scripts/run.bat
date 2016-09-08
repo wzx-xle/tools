@@ -1,5 +1,5 @@
 @echo off
-cd ..
-java -cp .;lib/*;conf/ App -c conf/app.properties
+
+java -cp .;lib/*;conf/ ren.wxyz.tool.data.sync.App -c conf/app.properties
 
 pause ...
