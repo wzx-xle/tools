@@ -9,6 +9,8 @@ package ren.wxyz.tool.common.file;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.SystemUtils;
 
+import java.nio.file.Path;
+
 /**
  * 路径帮助类
  *
@@ -69,5 +71,20 @@ public class PathHelper {
         }
 
         return false;
+    }
+
+    /**
+     * 获取类的路径
+     *
+     * @param clz 被参考的类对象
+     * @return 类路径
+     */
+    public static String getClassPath(Class<?> clz) {
+        String path = clz.getResource("/").getPath();
+        if (SystemUtils.IS_OS_WINDOWS) {
+            path = path.substring(1, path.length()).replace('/', '\\');
+        }
+
+        return path;
     }
 }

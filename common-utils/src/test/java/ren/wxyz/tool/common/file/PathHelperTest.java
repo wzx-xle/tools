@@ -8,6 +8,8 @@ package ren.wxyz.tool.common.file;
 
 import org.junit.Test;
 
+import java.io.File;
+
 import static org.junit.Assert.*;
 
 /**
@@ -76,5 +78,11 @@ public class PathHelperTest {
         assertFalse(PathHelper.isAbsolute("test\\test.txt"));
         assertFalse(PathHelper.isAbsolute("test/test.txt"));
         assertFalse(PathHelper.isAbsolute("\\test\\test.txt"));
+    }
+
+    @Test
+    public void testGetClassPath() {
+        String workPath = new File("").getAbsolutePath();
+        assertTrue(PathHelper.getClassPath(PathHelperTest.class).startsWith(workPath));
     }
 }
