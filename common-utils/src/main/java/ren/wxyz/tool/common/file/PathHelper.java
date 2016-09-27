@@ -9,6 +9,7 @@ package ren.wxyz.tool.common.file;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.SystemUtils;
 
+import java.io.File;
 import java.nio.file.Path;
 
 /**
@@ -31,7 +32,7 @@ public class PathHelper {
             path = "";
         }
 
-        StringBuilder sb = new StringBuilder(path.trim());
+        StringBuilder sb = new StringBuilder(normalizePath(path.trim()));
 
         if (null == paths || paths.length == 0) {
             return sb.toString();
@@ -39,12 +40,13 @@ public class PathHelper {
 
         for (String p : paths) {
             if (StringUtils.isNotBlank(p)) {
+                String tmpPath = normalizePath(p);
                 if (sb.length() > 0
-                        && sb.charAt(sb.length() - 1) != '/'
-                        && !p.startsWith("/")) {
-                    sb.append("/");
+                        && sb.charAt(sb.length() - 1) != File.separatorChar
+                        && !tmpPath.startsWith(File.separator)) {
+                    sb.append(File.separatorChar);
                 }
-                sb.append(p.trim());
+                sb.append(tmpPath.trim());
             }
         }
 
@@ -86,5 +88,26 @@ public class PathHelper {
         }
 
         return path;
+    }
+
+    /**
+     * 标准化路径，将给定的路径标准化为当前操作系统的路径
+     *
+     * @param path 路径
+     * @return 标准化之后的路径
+     */
+    public static String normalizePath(final String path) {
+        String resPath = path;
+        if (SystemUtils.IS_OS_WINDOWS) {
+            if (resPath.startsWith("/")) {
+                resPath = resPath.substring(1, resPath.length());
+            }
+            resPath = resPath.replace('/', File.separatorChar);
+        }
+        else {
+            resPath = resPath.replace('\\', File.separatorChar);
+        }
+
+        return resPath;
     }
 }

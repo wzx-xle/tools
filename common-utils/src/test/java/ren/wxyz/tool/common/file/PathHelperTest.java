@@ -6,6 +6,7 @@
  */
 package ren.wxyz.tool.common.file;
 
+import org.apache.commons.lang3.SystemUtils;
 import org.junit.Test;
 
 import java.io.File;
@@ -28,21 +29,44 @@ public class PathHelperTest {
         assertEquals("", PathHelper.join("  ", null));
 
         assertEquals("", PathHelper.join(null, null, null));
-        assertEquals("/t", PathHelper.join(null, "/t"));
-        assertEquals("t", PathHelper.join(null, "t"));
-        assertEquals("t/pp", PathHelper.join(null, "t", "pp"));
-        assertEquals("t/pp", PathHelper.join(null, "t", "/pp"));
-        assertEquals("t/pp/", PathHelper.join(null, "t", "/pp/"));
-        assertEquals("t/pp/ee", PathHelper.join(null, "t", "/pp/", "ee"));
-        assertEquals("/t", PathHelper.join("/t", null));
+        if (SystemUtils.IS_OS_WINDOWS) {
+            assertEquals("t", PathHelper.join(null, "/t"));
+            assertEquals("t", PathHelper.join(null, "t"));
+            assertEquals("t\\pp", PathHelper.join(null, "t", "pp"));
+            assertEquals("t\\pp", PathHelper.join(null, "t", "/pp"));
+            assertEquals("t\\pp\\", PathHelper.join(null, "t", "/pp/"));
+            assertEquals("t\\pp\\ee", PathHelper.join(null, "t", "/pp/", "ee"));
+            assertEquals("t", PathHelper.join("/t", null));
+            assertEquals("C:\\dd", PathHelper.join("/C:/dd", null));
+            assertEquals("C:\\dd\\ee", PathHelper.join("/C:/dd", "ee"));
 
-        assertEquals("t/pp", PathHelper.join("t", "pp"));
-        assertEquals("t/pp", PathHelper.join("t", "/pp"));
-        assertEquals("t/pp/", PathHelper.join("t", "/pp/"));
-        assertEquals("t/pp/ee", PathHelper.join("t", "/pp/", "ee"));
+            assertEquals("t\\pp", PathHelper.join("t", "pp"));
+            assertEquals("t\\pp", PathHelper.join("t", "/pp"));
+            assertEquals("t\\pp\\", PathHelper.join("t", "/pp/"));
+            assertEquals("t\\pp\\ee", PathHelper.join("t", "/pp/", "ee"));
 
-        assertEquals("t/pp/ee", PathHelper.join("t", "pp", null, "ee"));
-        assertEquals("t/pp/ee", PathHelper.join("t", "pp", null, "  ee"));
+            assertEquals("t\\pp\\ee", PathHelper.join("t", "pp", null, "ee"));
+            assertEquals("t\\pp\\ee", PathHelper.join("t", "pp", null, "  ee"));
+
+
+        }
+        else {
+            assertEquals("/t", PathHelper.join(null, "/t"));
+            assertEquals("t", PathHelper.join(null, "t"));
+            assertEquals("t/pp", PathHelper.join(null, "t", "pp"));
+            assertEquals("t/pp", PathHelper.join(null, "t", "/pp"));
+            assertEquals("t/pp/", PathHelper.join(null, "t", "/pp/"));
+            assertEquals("t/pp/ee", PathHelper.join(null, "t", "/pp/", "ee"));
+            assertEquals("/t", PathHelper.join("/t", null));
+
+            assertEquals("t/pp", PathHelper.join("t", "pp"));
+            assertEquals("t/pp", PathHelper.join("t", "/pp"));
+            assertEquals("t/pp/", PathHelper.join("t", "/pp/"));
+            assertEquals("t/pp/ee", PathHelper.join("t", "/pp/", "ee"));
+
+            assertEquals("t/pp/ee", PathHelper.join("t", "pp", null, "ee"));
+            assertEquals("t/pp/ee", PathHelper.join("t", "pp", null, "  ee"));
+        }
     }
 
     @Test
