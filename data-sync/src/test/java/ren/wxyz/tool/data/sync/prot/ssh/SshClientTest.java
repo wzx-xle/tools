@@ -17,15 +17,14 @@ import java.util.List;
  * @auther wxyz 2016-09-07_16:20
  * @since 1.0
  */
-@Ignore
+//@Ignore
 public class SshClientTest {
 
     private static SshClient ssh;
 
     @BeforeClass
     public static void setUp() throws Exception {
-        ssh = new SshClient("172.16.10.40", 22, "root", "iflytek!40");
-        ssh.setWorkDirectory(".");
+        ssh = new SshClient("172.16.10.40", 22, "root", "iflytek!40", ".");
         ssh.openSession();
     }
 

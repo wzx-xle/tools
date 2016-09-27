@@ -7,6 +7,7 @@
 package ren.wxyz.tool.data.sync.prot.ssh;
 
 import com.jcraft.jsch.*;
+import lombok.Generated;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -21,7 +22,6 @@ import java.util.*;
  * @auther wxyz 2016-09-06_11:49
  * @since 1.0
  */
-@Setter
 @Slf4j
 public class SshClient {
 
@@ -65,11 +65,12 @@ public class SshClient {
      */
     private Session session = null;
 
-    public SshClient(String host, int port, String username, String password) {
+    public SshClient(String host, int port, String username, String password, String workDir) {
         setHost(host);
         setPort(port);
         setUsername(username);
         setPassword(password);
+        setWorkDirectory(workDir);
     }
 
     /**
@@ -158,16 +159,14 @@ public class SshClient {
 
             // 遍历子目录
             if (subDir) {
-                List<FileInfo> subFiles = new ArrayList<>();
-
-                for (FileInfo file : files) {
+                int idx = 0;
+                while (idx < files.size()) {
+                    FileInfo file = files.get(idx++);
                     if (file.getFileType() == FileInfo.Type.DIR) {
                         List<FileInfo> tmp = list(sftp, file.getAbsolutePath());
-                        subFiles.addAll(tmp);
+                        files.addAll(tmp);
                     }
                 }
-
-                files.addAll(subFiles);
             }
         }
         finally {
@@ -260,6 +259,30 @@ public class SshClient {
             session.disconnect();
             session = null;
         }
+    }
+
+    public void setHost(String host) {
+        this.host = host;
+    }
+
+    public void setPort(int port) {
+        this.port = port;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public void setSessionTimeout(int sessionTimeout) {
+        this.sessionTimeout = sessionTimeout;
+    }
+
+    public void setWorkDirectory(String workDirectory) {
+        this.workDirectory = workDirectory;
     }
 
     /**
