@@ -7,8 +7,7 @@
 package ren.wxyz.tool.common.file;
 
 import org.apache.commons.lang3.StringUtils;
-
-import java.nio.file.Paths;
+import org.apache.commons.lang3.SystemUtils;
 
 /**
  * 路径帮助类
@@ -48,5 +47,27 @@ public class PathHelper {
         }
 
         return sb.toString();
+    }
+
+    /**
+     * 判断是绝对路径
+     *
+     * @param path 路径字符串
+     * @return
+     */
+    public static boolean isAbsolute( String path) {
+        if (StringUtils.isBlank(path)) {
+            throw new NullPointerException("path is blank.");
+        }
+
+        if (path.startsWith("/")) {
+            return true;
+        }
+
+        if (SystemUtils.IS_OS_WINDOWS && path.charAt(1) == ':') {
+            return true;
+        }
+
+        return false;
     }
 }

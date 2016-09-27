@@ -42,4 +42,39 @@ public class PathHelperTest {
         assertEquals("t/pp/ee", PathHelper.join("t", "pp", null, "ee"));
         assertEquals("t/pp/ee", PathHelper.join("t", "pp", null, "  ee"));
     }
+
+    @Test
+    public void testIsAbsolute() throws Exception {
+        try {
+            PathHelper.isAbsolute(null);
+        }
+        catch (NullPointerException e) {
+            assertEquals("path is blank.", e.getMessage());
+        }
+
+        try {
+            PathHelper.isAbsolute("");
+        }
+        catch (NullPointerException e) {
+            assertEquals("path is blank.", e.getMessage());
+        }
+
+        try {
+            PathHelper.isAbsolute("  ");
+        }
+        catch (NullPointerException e) {
+            assertEquals("path is blank.", e.getMessage());
+        }
+
+        assertTrue(PathHelper.isAbsolute("E:\\test.txt"));
+        assertTrue(PathHelper.isAbsolute("E:\\"));
+        assertTrue(PathHelper.isAbsolute("/E:/test.txt"));
+        assertTrue(PathHelper.isAbsolute("/test.txt"));
+
+        assertFalse(PathHelper.isAbsolute("test.txt"));
+        assertFalse(PathHelper.isAbsolute("test/test.txt"));
+        assertFalse(PathHelper.isAbsolute("test\\test.txt"));
+        assertFalse(PathHelper.isAbsolute("test/test.txt"));
+        assertFalse(PathHelper.isAbsolute("\\test\\test.txt"));
+    }
 }
