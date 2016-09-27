@@ -17,7 +17,7 @@ import java.util.List;
  * @auther wxyz 2016-09-07_16:20
  * @since 1.0
  */
-//@Ignore
+@Ignore
 public class SshClientTest {
 
     private static SshClient ssh;
