@@ -184,7 +184,7 @@ public class SshClient {
      * @return 文件列表
      */
     private List<FileInfo> list(ChannelSftp sftp, final String path) {
-        final String currPath = path.startsWith("/") ? path : PathHelper.join(this.workDirectory, path);
+        final String currPath = PathHelper.isAbsolute(path) ? path : PathHelper.join("/", this.workDirectory, path);
 
         final List<FileInfo> files = new ArrayList<>();
         try {
@@ -196,7 +196,7 @@ public class SshClient {
                     }
 
                     FileInfo info = new FileInfo();
-                    info.setAbsolutePath(PathHelper.join(currPath, entry.getFilename()));
+                    info.setAbsolutePath(PathHelper.join("/", currPath, entry.getFilename()));
                     info.setFilename(entry.getFilename());
                     info.setFileSize(entry.getAttrs().getSize());
                     info.setModifyDate(new Date(entry.getAttrs().getMTime() * 1000L));
