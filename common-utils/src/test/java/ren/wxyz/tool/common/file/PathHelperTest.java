@@ -30,43 +30,26 @@ public class PathHelperTest {
 
         assertEquals("", PathHelper.join(null, null, null));
         if (SystemUtils.IS_OS_WINDOWS) {
-            assertEquals("t", PathHelper.join(null, "/t"));
-            assertEquals("t", PathHelper.join(null, "t"));
-            assertEquals("t\\pp", PathHelper.join(null, "t", "pp"));
-            assertEquals("t\\pp", PathHelper.join(null, "t", "/pp"));
-            assertEquals("t\\pp\\", PathHelper.join(null, "t", "/pp/"));
-            assertEquals("t\\pp\\ee", PathHelper.join(null, "t", "/pp/", "ee"));
-            assertEquals("t", PathHelper.join("/t", null));
-            assertEquals("C:\\dd", PathHelper.join("/C:/dd", null));
-            assertEquals("C:\\dd\\ee", PathHelper.join("/C:/dd", "ee"));
-
-            assertEquals("t\\pp", PathHelper.join("t", "pp"));
-            assertEquals("t\\pp", PathHelper.join("t", "/pp"));
-            assertEquals("t\\pp\\", PathHelper.join("t", "/pp/"));
-            assertEquals("t\\pp\\ee", PathHelper.join("t", "/pp/", "ee"));
-
-            assertEquals("t\\pp\\ee", PathHelper.join("t", "pp", null, "ee"));
-            assertEquals("t\\pp\\ee", PathHelper.join("t", "pp", null, "  ee"));
-
-
+            assertEquals("t\\pp\\ee", PathHelper.join(null, "t", "pp", "ee"));
         }
         else {
-            assertEquals("/t", PathHelper.join(null, "/t"));
-            assertEquals("t", PathHelper.join(null, "t"));
-            assertEquals("t/pp", PathHelper.join(null, "t", "pp"));
-            assertEquals("t/pp", PathHelper.join(null, "t", "/pp"));
-            assertEquals("t/pp/", PathHelper.join(null, "t", "/pp/"));
-            assertEquals("t/pp/ee", PathHelper.join(null, "t", "/pp/", "ee"));
-            assertEquals("/t", PathHelper.join("/t", null));
-
-            assertEquals("t/pp", PathHelper.join("t", "pp"));
-            assertEquals("t/pp", PathHelper.join("t", "/pp"));
-            assertEquals("t/pp/", PathHelper.join("t", "/pp/"));
-            assertEquals("t/pp/ee", PathHelper.join("t", "/pp/", "ee"));
-
-            assertEquals("t/pp/ee", PathHelper.join("t", "pp", null, "ee"));
-            assertEquals("t/pp/ee", PathHelper.join("t", "pp", null, "  ee"));
+            assertEquals("t/pp/ee", PathHelper.join(null, "t", "pp", "ee"));
         }
+
+        assertEquals("t\\pp", PathHelper.join("\\", "t", "pp"));
+        assertEquals("t/pp", PathHelper.join("\\", "t", "/pp"));
+        assertEquals("t/pp/", PathHelper.join("\\", "t", "/pp/"));
+        assertEquals("t/pp/ee", PathHelper.join("\\", "t", "/pp/", "ee"));
+        assertEquals("\\t", PathHelper.join("\\", "\\t", null));
+
+        assertEquals("t\\pp\\ee", PathHelper.join("\\", "t", "pp", null, "ee"));
+        assertEquals("t\\pp\\ee", PathHelper.join("\\", "t", "pp", null, "  ee"));
+
+        assertEquals("t/pp", PathHelper.join("/", "t", "pp"));
+        assertEquals("t/pp", PathHelper.join("/", "t", "/pp"));
+        assertEquals("t/pp/", PathHelper.join("/", "t", "/pp/"));
+        assertEquals("t/pp/ee", PathHelper.join("/", "t", "/pp/", "ee"));
+        assertEquals("/t", PathHelper.join("/", "/t", null));
     }
 
     @Test
@@ -108,5 +91,17 @@ public class PathHelperTest {
     public void testGetClassPath() {
         String workPath = new File("").getAbsolutePath();
         assertTrue(PathHelper.getClassPath(PathHelperTest.class).startsWith(workPath));
+    }
+
+    @Test
+    public void testNormalizePath() {
+        if (SystemUtils.IS_OS_WINDOWS) {
+            assertEquals("C:\\dd\\tt.txt", PathHelper.normalizePath("C:\\dd\\tt.txt"));
+            assertEquals("C:\\dd\\tt.txt", PathHelper.normalizePath("/C:/dd/tt.txt"));
+        }
+        else {
+            assertEquals("C:/dd/tt.txt", PathHelper.normalizePath("C:\\dd\\tt.txt"));
+            assertEquals("/dd/tt.txt", PathHelper.normalizePath("\\dd\\tt.txt"));
+        }
     }
 }
