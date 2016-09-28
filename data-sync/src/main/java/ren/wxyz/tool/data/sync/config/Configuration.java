@@ -31,6 +31,11 @@ public class Configuration {
     private List<SyncAppInfo> apps;
 
     /**
+     * 默认的配置文件路径
+     */
+    public static final String DEFAULT_CONFIGUATION_FILE = "app.xml";
+
+    /**
      * 解析配置文件
      *
      * @param configFile 配置文件
