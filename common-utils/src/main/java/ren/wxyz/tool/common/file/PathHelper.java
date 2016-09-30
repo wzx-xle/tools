@@ -73,7 +73,7 @@ public class PathHelper {
             return true;
         }
 
-        if (SystemUtils.IS_OS_WINDOWS && path.charAt(1) == ':') {
+        if (path.length() > 1 && path.charAt(1) == ':') {
             return true;
         }
 

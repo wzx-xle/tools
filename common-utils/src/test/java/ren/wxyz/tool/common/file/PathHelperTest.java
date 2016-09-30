@@ -58,7 +58,7 @@ public class PathHelperTest {
             PathHelper.isAbsolute(null);
         }
         catch (NullPointerException e) {
-            assertEquals("path is blank.", e.getMessage());
+            assertEquals("path is null.", e.getMessage());
         }
 
         assertFalse(PathHelper.isAbsolute(""));
