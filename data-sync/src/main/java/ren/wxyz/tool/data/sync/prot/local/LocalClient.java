@@ -48,6 +48,11 @@ public class LocalClient {
      * @return 文件列表
      */
     public List<FileInfo> list(String path, boolean subDir) {
+        // 根路径
+        String rootPath = PathHelper.isAbsolute(path) ? path : PathHelper.join(null, this.workDir, path);
+        rootPath = PathHelper.normalizePath(rootPath);
+        rootPath = rootPath.endsWith(File.separator) ? rootPath : rootPath + File.separator;
+
         List<FileInfo> files = list(path);
 
         if (subDir) {
@@ -59,6 +64,11 @@ public class LocalClient {
                     files.addAll(tmp);
                 }
             }
+        }
+
+        // 相对路径
+        for (FileInfo fi : files) {
+            fi.setRelativePath(fi.getAbsolutePath().replace(rootPath, ""));
         }
 
         return files;
@@ -74,8 +84,23 @@ public class LocalClient {
         List<FileInfo> files = new ArrayList<>();
         File p = new File(PathHelper.isAbsolute(path) ? path : PathHelper.join("\\", this.workDir, path));
 
+        if (!p.exists()) {
+            return files;
+        }
+        if (p.isFile()) {
+            FileInfo fi = new FileInfo();
+            fi.setAbsolutePath(p.getAbsolutePath());
+            fi.setFilename(p.getName());
+            fi.setFileSize(p.length());
+            fi.setModifyDate(new Date(p.lastModified()));
+            fi.setFileType(getFileType(p));
+
+            files.add(fi);
+            return files;
+        }
         // 遍历目录下的文件
         File[] filelist = p.listFiles();
+
         for (File f : filelist) {
             FileInfo fi = new FileInfo();
             fi.setAbsolutePath(f.getAbsolutePath());

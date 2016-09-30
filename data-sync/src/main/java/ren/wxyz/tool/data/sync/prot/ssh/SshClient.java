@@ -14,6 +14,7 @@ import org.apache.commons.lang3.StringUtils;
 import ren.wxyz.tool.common.file.PathHelper;
 import ren.wxyz.tool.data.sync.prot.FileInfo;
 
+import java.io.File;
 import java.util.*;
 
 /**
@@ -124,9 +125,7 @@ public class SshClient {
             if (StringUtils.isNotBlank(this.workDirectory)) {
                 sftp.cd(this.workDirectory);
             }
-            else {
-                this.workDirectory = sftp.pwd();
-            }
+            this.workDirectory = sftp.pwd();
 
             return sftp;
         }
@@ -148,13 +147,20 @@ public class SshClient {
 
         List<FileInfo> files = Collections.EMPTY_LIST;
         try {
+            // 根路径
+            String rootPath = PathHelper.isAbsolute(path) ? path : PathHelper.join("/", this.workDirectory, path);
+            rootPath = rootPath.endsWith("/") ? rootPath : rootPath + "/";
+
             // 当前路径下
             files = list(sftp, path);
 
             // 路径是文件
+            boolean isFile = false;
             if (files.size() == 1 && files.get(0).getAbsolutePath().startsWith(path)) {
                 files.get(0).setAbsolutePath(path);
+                files.get(0).setRelativePath("");
                 subDir = false;
+                isFile = true;
             }
 
             // 遍历子目录
@@ -166,6 +172,13 @@ public class SshClient {
                         List<FileInfo> tmp = list(sftp, file.getAbsolutePath());
                         files.addAll(tmp);
                     }
+                }
+            }
+
+            if (!isFile) {
+                // 相对路径
+                for (FileInfo fi : files) {
+                    fi.setRelativePath(fi.getAbsolutePath().replace(rootPath, ""));
                 }
             }
         }
@@ -188,7 +201,7 @@ public class SshClient {
 
         final List<FileInfo> files = new ArrayList<>();
         try {
-            sftp.ls(path, new ChannelSftp.LsEntrySelector() {
+            sftp.ls(currPath, new ChannelSftp.LsEntrySelector() {
                 @Override
                 public int select(ChannelSftp.LsEntry entry) {
                     if (entry.getFilename().equals(".") || entry.getFilename().equals("..")) {
@@ -208,7 +221,7 @@ public class SshClient {
             });
         }
         catch (SftpException e) {
-            log.error("读取远程文件列表异常：{}", e.getMessage());
+            log.error("读取远程文件列表异常：{}, path={}", e.getMessage(), currPath);
         }
 
         return files;

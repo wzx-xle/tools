@@ -40,24 +40,38 @@ public class SshClientTest {
 
         String path = "/root";
         List<FileInfo> files = ssh.list(path, true);
-        System.out.println(files.size());
-        for (FileInfo file : files) {
-            System.out.println(file.getAbsolutePath());
-        }
+        printFileInfo(files);
 
         path = "/root/uc.zip";
         files = ssh.list(path, true);
-        System.out.println(files.size());
-        for (FileInfo file : files) {
-            System.out.println(file.getAbsolutePath());
-        }
+        printFileInfo(files);
+
+        path = "uc.zip"; // TODO 有BUG
+        files = ssh.list(path, true);
+        printFileInfo(files);
 
         ssh.setWorkDirectory(workDir);
         path = "dataexchange";
         files = ssh.list(path, true);
+        printFileInfo(files);
+
+        path = "dataexchange/dfsfsdfsfs";
+        files = ssh.list(path, true);
+        printFileInfo(files);
+
+        path = "";
+        files = ssh.list(path, true);
+        printFileInfo(files);
+    }
+
+    private void printFileInfo(List<FileInfo> files) {
+        String printFormat = "%s,%d,%d";
         System.out.println(files.size());
-        for (FileInfo file : files) {
-            System.out.println(file.getAbsolutePath());
+        for (FileInfo f : files) {
+            if (f.getFileType() != FileInfo.Type.DIR) {
+                System.out.println(String.format(printFormat,
+                        f.getRelativePath(), f.getFileSize(), f.getModifyDate().getTime()));
+            }
         }
     }
 }

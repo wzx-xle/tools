@@ -39,7 +39,17 @@ public class App {
     private static int deamonPeriodSecond = 0;
 
     public static void main(String[] args) {
-        System.out.println("Hello World!");
+        int code = cli(args);
+        switch (code) {
+            case 0:
+                // 命令行方式启动
+                break;
+            case 1:
+                // 图形界面方式启动
+                break;
+            default:
+                break;
+        }
     }
 
     /**
@@ -99,7 +109,7 @@ public class App {
                         deamonPeriodSecond = peroid;
                     }
                     else {
-                        log.warn("周期数无效，{}", peroid);
+                        log.warn("周期数必须大于-1，{}", peroid);
                     }
                 }
 

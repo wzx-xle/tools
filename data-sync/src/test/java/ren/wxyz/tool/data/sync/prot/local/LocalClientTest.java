@@ -44,14 +44,22 @@ public class LocalClientTest {
 
         files = localClient.list("", true);
         printFileInfo(files);
+
+        files = localClient.list("test-local-client\\test", true);
+        printFileInfo(files);
+
+        files = localClient.list("test-local-client\\dfsdfsfsdfs", true);
+        printFileInfo(files);
     }
 
     private void printFileInfo(List<FileInfo> files) {
         String printFormat = "%s,%d,%d";
         System.out.println(files.size());
         for (FileInfo f : files) {
-            System.out.println(String.format(printFormat,
-                    f.getAbsolutePath(), f.getFileSize(), f.getModifyDate().getTime()));
+            if (f.getFileType() != FileInfo.Type.DIR) {
+                System.out.println(String.format(printFormat,
+                        f.getRelativePath(), f.getFileSize(), f.getModifyDate().getTime()));
+            }
         }
     }
 }
