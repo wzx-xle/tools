@@ -42,7 +42,8 @@ public class LocalClientTest {
         files = localClient.list(path, false);
         printFileInfo(files);
 
-        
+        files = localClient.list("", true);
+        printFileInfo(files);
     }
 
     private void printFileInfo(List<FileInfo> files) {
