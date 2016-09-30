@@ -24,7 +24,12 @@ import java.util.List;
 public class SyncAppInfo {
 
     @XStreamAsAttribute
-    private String conn;
+    @XStreamAlias("source-ref")
+    private String sourceRef;
+
+    @XStreamAsAttribute
+    @XStreamAlias("target-ref")
+    private String targetRef;
 
     @XStreamImplicit
     private List<SyncInfo> syncs;

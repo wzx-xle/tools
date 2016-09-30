@@ -1,16 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <apps>
+    <conn id="local">
+        <protocol>local</protocol>
+        <workDir>D:\test</workDir>
+    </conn>
     <conn id="103">
-        <protocol>SSH</protocol>
+        <protocol>ssh</protocol>
         <host>192.168.1.103</host>
         <port>22</port>
         <username>test</username>
         <password>test</password>
+        <workDir>/server</workDir>
     </conn>
-    <app conn="103">
+    <app source-ref="local" target-ref="103">
         <sync delete="true">
-            <item local="./conf" remote="/server/conf" />
-            <item local="./tomcat/webapps" remote="/server/tomcat/webapps" />
+            <item source="./conf" target="/server/conf" />
+            <item source="./tomcat/webapps" target="/server/tomcat/webapps" />
         </sync>
         <okExec>/server/tomcat/bin/restart.sh</okExec>
     </app>

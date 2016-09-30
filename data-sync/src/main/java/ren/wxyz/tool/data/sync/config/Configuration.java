@@ -25,7 +25,7 @@ import java.util.List;
 public class Configuration {
 
     @XStreamImplicit
-    private List<RemoteConnection> conns;
+    private List<Connection> conns;
 
     @XStreamImplicit
     private List<SyncAppInfo> apps;

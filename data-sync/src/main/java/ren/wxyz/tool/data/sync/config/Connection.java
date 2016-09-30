@@ -18,7 +18,7 @@ import lombok.Data;
  */
 @Data
 @XStreamAlias("conn")
-public class RemoteConnection {
+public class Connection {
 
     /**
      * ID，唯一标识一个连接
@@ -50,4 +50,9 @@ public class RemoteConnection {
      * 连接密码
      */
     private String password;
+
+    /**
+     * 工作目录
+     */
+    private String workDir;
 }

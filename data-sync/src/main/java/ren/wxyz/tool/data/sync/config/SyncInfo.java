@@ -36,12 +36,12 @@ public class SyncInfo {
          * 本地目录
          */
         @XStreamAsAttribute
-        private String local;
+        private String source;
 
         /**
          * 远程目录
          */
         @XStreamAsAttribute
-        private String remote;
+        private String target;
     }
 }

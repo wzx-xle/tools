@@ -7,6 +7,7 @@
 package ren.wxyz.tool.data.sync.config;
 
 import org.junit.Test;
+import ren.wxyz.tool.common.file.PathHelper;
 
 import java.util.List;
 
@@ -20,23 +21,30 @@ import static org.junit.Assert.*;
  */
 public class ConfigurationTest {
 
-    private String classPath = ConfigurationTest.class.getResource("/").getPath();
+    private String classPath = PathHelper.normalizePath(PathHelper.getClassPath(ConfigurationTest.class));
 
     @Test
     public void testParse() throws Exception {
         Configuration config = Configuration.parse(classPath + "app-test.xml");
-        assertEquals(1, config.getConns().size());
+        assertEquals(2, config.getConns().size());
 
-        RemoteConnection conn = config.getConns().get(0);
+        Connection conn = config.getConns().get(0);
+        assertEquals("local", conn.getId());
+        assertEquals("local",conn.getProtocol());
+        assertEquals("D:\\test", conn.getWorkDir());
+
+        conn = config.getConns().get(1);
         assertEquals("103", conn.getId());
-        assertEquals("SSH",conn.getProtocol());
+        assertEquals("ssh",conn.getProtocol());
         assertEquals("192.168.1.103",conn.getHost());
         assertEquals(22,conn.getPort());
         assertEquals("test",conn.getUsername());
         assertEquals("test",conn.getPassword());
+        assertEquals("/server", conn.getWorkDir());
 
         SyncAppInfo app = config.getApps().get(0);
-        assertEquals("103", app.getConn());
+        assertEquals("local", app.getSourceRef());
+        assertEquals("103", app.getTargetRef());
         assertEquals("/server/tomcat/bin/restart.sh", app.getOkExec());
         assertEquals(1, app.getSyncs().size());
 
@@ -45,9 +53,9 @@ public class ConfigurationTest {
         assertEquals(2, sync.getItems().size());
 
         List<SyncInfo.Item> items = sync.getItems();
-        assertEquals("./conf", items.get(0).getLocal());
-        assertEquals("/server/conf", items.get(0).getRemote());
-        assertEquals("./tomcat/webapps", items.get(1).getLocal());
-        assertEquals("/server/tomcat/webapps", items.get(1).getRemote());
+        assertEquals("./conf", items.get(0).getSource());
+        assertEquals("/server/conf", items.get(0).getTarget());
+        assertEquals("./tomcat/webapps", items.get(1).getSource());
+        assertEquals("/server/tomcat/webapps", items.get(1).getTarget());
     }
 }
