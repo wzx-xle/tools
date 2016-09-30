@@ -87,6 +87,7 @@ public class PathHelperTest {
         if (SystemUtils.IS_OS_WINDOWS) {
             assertEquals("C:\\dd\\tt.txt", PathHelper.normalizePath("C:\\dd\\tt.txt"));
             assertEquals("C:\\dd\\tt.txt", PathHelper.normalizePath("/C:/dd/tt.txt"));
+            assertEquals("C:\\dd\\tt.txt", PathHelper.normalizePath("/c:/dd/tt.txt"));
         }
         else {
             assertEquals("C:/dd/tt.txt", PathHelper.normalizePath("C:\\dd\\tt.txt"));

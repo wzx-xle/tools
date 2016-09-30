@@ -108,8 +108,17 @@ public class PathHelper {
 
         String resPath = path;
         if (SystemUtils.IS_OS_WINDOWS) {
-            if (resPath.startsWith("/")) {
+            // 处理 /E:/ 这种路径
+            if (resPath.startsWith("/") && resPath.charAt(2) == ':') {
                 resPath = resPath.substring(1, resPath.length());
+            }
+            // 统一首字母大写
+            if (resPath.charAt(1) == ':') {
+                char firstChar = resPath.charAt(0);
+                if (firstChar >= 97 && firstChar <= 122) {
+                    firstChar -= 32;
+                }
+                resPath = firstChar + resPath.substring(1);
             }
             resPath = resPath.replace('/', File.separatorChar);
         }
