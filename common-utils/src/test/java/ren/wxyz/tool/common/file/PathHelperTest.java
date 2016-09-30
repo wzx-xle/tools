@@ -61,19 +61,8 @@ public class PathHelperTest {
             assertEquals("path is blank.", e.getMessage());
         }
 
-        try {
-            PathHelper.isAbsolute("");
-        }
-        catch (NullPointerException e) {
-            assertEquals("path is blank.", e.getMessage());
-        }
-
-        try {
-            PathHelper.isAbsolute("  ");
-        }
-        catch (NullPointerException e) {
-            assertEquals("path is blank.", e.getMessage());
-        }
+        assertFalse(PathHelper.isAbsolute(""));
+        assertFalse(PathHelper.isAbsolute("  "));
 
         assertTrue(PathHelper.isAbsolute("E:\\test.txt"));
         assertTrue(PathHelper.isAbsolute("E:\\"));

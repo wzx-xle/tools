@@ -65,8 +65,8 @@ public class PathHelper {
      * @return
      */
     public static boolean isAbsolute(String path) {
-        if (StringUtils.isBlank(path)) {
-            throw new NullPointerException("path is blank.");
+        if (null == path) {
+            throw new NullPointerException("path is null.");
         }
 
         if (path.startsWith("/")) {
