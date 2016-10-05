@@ -6,16 +6,28 @@
  */
 package ren.wxyz.tool.common.bean;
 
-import lombok.Data;
-
 /**
  * 引用对象
  *
  * @author wxyz 2016-10-05_15:55
  * @since 1.0
  */
-@Data
 public class RefObject<T> {
 
-    private volatile T obj;
+    /**
+     * 引用的值
+     */
+    private volatile T value;
+
+    public RefObject(T defaultValue) {
+        this.value = defaultValue;
+    }
+
+    public T get() {
+        return this.value;
+    }
+
+    public void set(T value) {
+        this.value = value;
+    }
 }
