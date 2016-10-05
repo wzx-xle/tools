@@ -4,7 +4,7 @@
  * This program can be distributed under the terms of the GNU GPL Version 2.
  * See the file LICENSE.
  */
-package ren.wxyz.tool.data.sync;
+package ren.wxyz.tool.data.sync.sync;
 
 /**
  * 文件同步
