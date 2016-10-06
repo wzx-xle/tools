@@ -7,14 +7,14 @@
 package ren.wxyz.tool.data.sync.prot.ssh;
 
 import com.jcraft.jsch.*;
-import lombok.Generated;
-import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import ren.wxyz.tool.common.bean.RefObject;
 import ren.wxyz.tool.common.file.PathHelper;
 import ren.wxyz.tool.data.sync.prot.FileInfo;
 
-import java.io.File;
+import java.lang.ref.Reference;
+import java.nio.file.Path;
 import java.util.*;
 
 /**
@@ -59,7 +59,7 @@ public class SshClient {
     /**
      * 登陆后的默认目录
      */
-    private String workDirectory;
+    private String workDir;
 
     /**
      * 会话连接
@@ -71,7 +71,7 @@ public class SshClient {
         setPort(port);
         setUsername(username);
         setPassword(password);
-        setWorkDirectory(workDir);
+        setWorkDir(workDir);
     }
 
     /**
@@ -122,10 +122,10 @@ public class SshClient {
             sftp.connect();
 
             // 设置或更新工作目录
-            if (StringUtils.isNotBlank(this.workDirectory)) {
-                sftp.cd(this.workDirectory);
+            if (StringUtils.isNotBlank(this.workDir)) {
+                sftp.cd(this.workDir);
             }
-            this.workDirectory = sftp.pwd();
+            this.workDir = sftp.pwd();
 
             return sftp;
         }
@@ -148,17 +148,14 @@ public class SshClient {
         List<FileInfo> files = Collections.EMPTY_LIST;
         try {
             // 根路径
-            String rootPath = PathHelper.isAbsolute(path) ? path : PathHelper.join("/", this.workDirectory, path);
-            rootPath = rootPath.endsWith("/") ? rootPath : rootPath + "/";
+            String rootPath = PathHelper.isAbsolute(path) ? path : PathHelper.join("/", this.workDir, path);
 
             // 当前路径下
-            files = list(sftp, path);
+            files = list(sftp, rootPath);
 
             // 路径是文件
             boolean isFile = false;
-            if (files.size() == 1 && files.get(0).getAbsolutePath().startsWith(path)) {
-                files.get(0).setAbsolutePath(path);
-                files.get(0).setRelativePath("");
+            if (files.size() == 1 && files.get(0).getAbsolutePath().equals(rootPath)) {
                 subDir = false;
                 isFile = true;
             }
@@ -175,11 +172,19 @@ public class SshClient {
                 }
             }
 
+            // 相对路径
             if (!isFile) {
-                // 相对路径
-                for (FileInfo fi : files) {
-                    fi.setRelativePath(fi.getAbsolutePath().replace(rootPath, ""));
+                rootPath = rootPath.endsWith("/") ? rootPath : rootPath + "/";
+            }
+            // 一个文件路径的相对路径，应该是其目录
+            else {
+                if (PathHelper.isAbsolute(path)) {
+                    rootPath = path;
                 }
+                rootPath = rootPath.substring(0, rootPath.lastIndexOf('/') + 1);
+            }
+            for (FileInfo fi : files) {
+                fi.setRelativePath(fi.getAbsolutePath().replace(rootPath, ""));
             }
         }
         finally {
@@ -197,19 +202,24 @@ public class SshClient {
      * @return 文件列表
      */
     private List<FileInfo> list(ChannelSftp sftp, final String path) {
-        final String currPath = PathHelper.isAbsolute(path) ? path : PathHelper.join("/", this.workDirectory, path);
-
         final List<FileInfo> files = new ArrayList<>();
         try {
-            sftp.ls(currPath, new ChannelSftp.LsEntrySelector() {
+            sftp.ls(path, new ChannelSftp.LsEntrySelector() {
+                private boolean isDir = false;
                 @Override
                 public int select(ChannelSftp.LsEntry entry) {
                     if (entry.getFilename().equals(".") || entry.getFilename().equals("..")) {
+                        isDir = true;
                         return 0;
                     }
 
                     FileInfo info = new FileInfo();
-                    info.setAbsolutePath(PathHelper.join("/", currPath, entry.getFilename()));
+                    if (isDir) {
+                        info.setAbsolutePath(PathHelper.join("/", path, entry.getFilename()));
+                    }
+                    else {
+                        info.setAbsolutePath(path);
+                    }
                     info.setFilename(entry.getFilename());
                     info.setFileSize(entry.getAttrs().getSize());
                     info.setModifyDate(new Date(entry.getAttrs().getMTime() * 1000L));
@@ -221,10 +231,40 @@ public class SshClient {
             });
         }
         catch (SftpException e) {
-            log.error("读取远程文件列表异常：{}, path={}", e.getMessage(), currPath);
+            log.error("读取远程文件列表异常：{}, path={}", e.getMessage(), path);
         }
 
         return files;
+    }
+
+    /**
+     * 判断一个路径是否目录文件
+     *
+     * @param path 路径
+     * @return
+     */
+
+    private boolean isDirectory(final ChannelSftp sftp, final String path) {
+        final RefObject<Boolean> isDir = new RefObject<>(false);
+        try {
+            sftp.ls(path, new ChannelSftp.LsEntrySelector() {
+                @Override
+                public int select(ChannelSftp.LsEntry entry) {
+                    if (entry.getFilename().equals(".") || entry.getFilename().equals("..")) {
+                        isDir.set(true);
+                        return 1;
+                    }
+
+                    return 0;
+                }
+            });
+        }
+        catch (SftpException e) {
+            log.error("读取远程文件列表异常：{}, path={}", e.getMessage(), path);
+            throw new RuntimeException(e);
+        }
+
+        return isDir.get();
     }
 
     /**
@@ -294,8 +334,8 @@ public class SshClient {
         this.sessionTimeout = sessionTimeout;
     }
 
-    public void setWorkDirectory(String workDirectory) {
-        this.workDirectory = workDirectory;
+    public void setWorkDir(String workDir) {
+        this.workDir = workDir;
     }
 
     /**

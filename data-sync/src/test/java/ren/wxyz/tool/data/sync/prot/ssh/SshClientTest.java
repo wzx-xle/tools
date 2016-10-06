@@ -24,7 +24,8 @@ public class SshClientTest {
 
     @BeforeClass
     public static void setUp() throws Exception {
-        ssh = new SshClient("172.16.10.40", 22, "root", "iflytek!40", ".");
+//        ssh = new SshClient("172.16.10.40", 22, "root", "iflytek!40", ".");
+        ssh = new SshClient("192.168.1.31", 22, "root", "123456", ".");
         ssh.openSession();
     }
 
@@ -40,33 +41,33 @@ public class SshClientTest {
 
         String path = "/root";
         List<FileInfo> files = ssh.list(path, true);
-        printFileInfo(files);
+        printFileInfo(files, path);
 
         path = "/root/uc.zip";
         files = ssh.list(path, true);
-        printFileInfo(files);
+        printFileInfo(files, path);
 
         path = "uc.zip"; // TODO 有BUG
         files = ssh.list(path, true);
-        printFileInfo(files);
+        printFileInfo(files, path);
 
-        ssh.setWorkDirectory(workDir);
+        ssh.setWorkDir(workDir);
         path = "dataexchange";
         files = ssh.list(path, true);
-        printFileInfo(files);
+        printFileInfo(files, path);
 
         path = "dataexchange/dfsfsdfsfs";
         files = ssh.list(path, true);
-        printFileInfo(files);
+        printFileInfo(files, path);
 
         path = "";
         files = ssh.list(path, true);
-        printFileInfo(files);
+        printFileInfo(files, "空路径");
     }
 
-    private void printFileInfo(List<FileInfo> files) {
+    private void printFileInfo(List<FileInfo> files, String info) {
         String printFormat = "%s,%d,%d";
-        System.out.println(files.size());
+        System.out.println(info + "：" + files.size());
         for (FileInfo f : files) {
             if (f.getFileType() != FileInfo.Type.DIR) {
                 System.out.println(String.format(printFormat,
