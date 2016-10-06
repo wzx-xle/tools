@@ -4,10 +4,11 @@
  * This program can be distributed under the terms of the GNU GPL Version 2.
  * See the file LICENSE.
  */
-package ren.wxyz.tool.data.sync.prot.ssh;
+package ren.wxyz.tool.data.sync.prot;
 
 import org.junit.*;
 import ren.wxyz.tool.data.sync.prot.FileInfo;
+import ren.wxyz.tool.data.sync.prot.SshClient;
 
 import java.util.List;
 

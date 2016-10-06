@@ -6,8 +6,7 @@
  */
 package ren.wxyz.tool.data.sync.prot;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.*;
 
 import java.util.Date;
 
@@ -17,7 +16,8 @@ import java.util.Date;
  * @auther wxyz 2016-09-06_17:41
  * @since 1.0
  */
-@Data
+@Getter
+@Setter(AccessLevel.PACKAGE)
 @EqualsAndHashCode(exclude={"absolutePath"})
 public class FileInfo {
 

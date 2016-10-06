@@ -4,18 +4,13 @@
  * This program can be distributed under the terms of the GNU GPL Version 2.
  * See the file LICENSE.
  */
-package ren.wxyz.tool.data.sync.prot.local;
+package ren.wxyz.tool.data.sync.prot;
 
-import org.junit.After;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import ren.wxyz.tool.common.file.PathHelper;
-import ren.wxyz.tool.data.sync.prot.FileInfo;
 
 import java.util.List;
-
-import static org.junit.Assert.*;
 
 /**
  * 测试本地客户端

@@ -4,7 +4,7 @@
  * This program can be distributed under the terms of the GNU GPL Version 2.
  * See the file LICENSE.
  */
-package ren.wxyz.tool.data.sync.prot.ssh;
+package ren.wxyz.tool.data.sync.prot;
 
 import com.jcraft.jsch.*;
 import lombok.extern.slf4j.Slf4j;
@@ -235,36 +235,6 @@ public class SshClient {
         }
 
         return files;
-    }
-
-    /**
-     * 判断一个路径是否目录文件
-     *
-     * @param path 路径
-     * @return
-     */
-
-    private boolean isDirectory(final ChannelSftp sftp, final String path) {
-        final RefObject<Boolean> isDir = new RefObject<>(false);
-        try {
-            sftp.ls(path, new ChannelSftp.LsEntrySelector() {
-                @Override
-                public int select(ChannelSftp.LsEntry entry) {
-                    if (entry.getFilename().equals(".") || entry.getFilename().equals("..")) {
-                        isDir.set(true);
-                        return 1;
-                    }
-
-                    return 0;
-                }
-            });
-        }
-        catch (SftpException e) {
-            log.error("读取远程文件列表异常：{}, path={}", e.getMessage(), path);
-            throw new RuntimeException(e);
-        }
-
-        return isDir.get();
     }
 
     /**
