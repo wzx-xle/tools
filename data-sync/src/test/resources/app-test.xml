@@ -17,6 +17,7 @@
             <item source="./conf" target="/server/conf" />
             <item source="./tomcat/webapps" target="/server/tomcat/webapps" />
         </sync>
-        <okExec>/server/tomcat/bin/restart.sh</okExec>
+        <beforeExec>/server/tomcat/bin/shutdown.sh</beforeExec>
+        <afterExec>/server/tomcat/bin/start.sh</afterExec>
     </app>
 </apps>

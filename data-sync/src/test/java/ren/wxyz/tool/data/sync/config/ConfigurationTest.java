@@ -45,7 +45,8 @@ public class ConfigurationTest {
         SyncAppInfo app = config.getApps().get(0);
         assertEquals("local", app.getSourceRef());
         assertEquals("103", app.getTargetRef());
-        assertEquals("/server/tomcat/bin/restart.sh", app.getOkExec());
+        assertEquals("/server/tomcat/bin/shutdown.sh", app.getBeforeExec());
+        assertEquals("/server/tomcat/bin/start.sh", app.getAfterExec());
         assertEquals(1, app.getSyncs().size());
 
         SyncInfo sync = app.getSyncs().get(0);

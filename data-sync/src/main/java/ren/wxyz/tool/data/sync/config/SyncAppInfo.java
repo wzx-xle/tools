@@ -34,5 +34,7 @@ public class SyncAppInfo {
     @XStreamImplicit
     private List<SyncInfo> syncs;
 
-    private String okExec;
+    private String beforeExec;
+
+    private String afterExec;
 }
