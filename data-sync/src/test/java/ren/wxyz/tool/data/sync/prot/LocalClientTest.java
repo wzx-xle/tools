@@ -12,6 +12,8 @@ import ren.wxyz.tool.common.file.PathHelper;
 
 import java.util.List;
 
+import static org.junit.Assert.*;
+
 /**
  * 测试本地客户端
  *
@@ -29,32 +31,60 @@ public class LocalClientTest {
 
     @Test
     public void testList() throws Exception {
-        String path = "test-local-client";
-
-        List<FileInfo> files = localClient.list(path, true);
-        printFileInfo(files);
-
-        files = localClient.list(path, false);
-        printFileInfo(files);
-
-        files = localClient.list("", true);
-        printFileInfo(files);
-
-        files = localClient.list("test-local-client\\test", true);
-        printFileInfo(files);
-
-        files = localClient.list("test-local-client\\dfsdfsfsdfs", true);
-        printFileInfo(files);
-    }
-
-    private void printFileInfo(List<FileInfo> files) {
-        String printFormat = "%s,%d,%d";
-        System.out.println(files.size());
-        for (FileInfo f : files) {
-            if (f.getFileType() != FileInfo.Type.DIR) {
-                System.out.println(String.format(printFormat,
-                        f.getRelativePath(), f.getFileSize(), f.getModifyDate().getTime()));
+        List<FileInfo> files = localClient.list("test-local-client", true);
+        assertEquals(8, files.size());
+        int count = 0;
+        for (FileInfo fi : files) {
+            if (fi.getRelativePath().equals(PathHelper.normalizePath("test"))) {
+                count++;
+            }
+            if (fi.getRelativePath().equals(PathHelper.normalizePath("sub1\\ttsub1.txt"))) {
+                count++;
+            }
+            if (fi.getRelativePath().equals(PathHelper.normalizePath("sub1\\ttsub2.txt"))) {
+                count++;
+            }
+            if (fi.getRelativePath().equals(PathHelper.normalizePath("sub2\\ttsub2.txt"))) {
+                count++;
+            }
+            if (fi.getRelativePath().equals(PathHelper.normalizePath("sub2\\sub2-sub1\\ttsub2-sub1.txt"))) {
+                count++;
             }
         }
+        assertEquals(5, count);
+
+        files = localClient.list("test-local-client", false);
+        assertEquals(3, files.size());
+        count = 0;
+        for (FileInfo fi : files) {
+            if (fi.getRelativePath().equals(PathHelper.normalizePath("test"))) {
+                count++;
+            }
+            if (fi.getRelativePath().equals(PathHelper.normalizePath("sub1\\ttsub1.txt"))) {
+                count--;
+            }
+            if (fi.getRelativePath().equals(PathHelper.normalizePath("sub1\\ttsub2.txt"))) {
+                count--;
+            }
+            if (fi.getRelativePath().equals(PathHelper.normalizePath("sub2\\ttsub2.txt"))) {
+                count--;
+            }
+            if (fi.getRelativePath().equals(PathHelper.normalizePath("sub2\\sub2-sub1\\ttsub2-sub1.txt"))) {
+                count--;
+            }
+        }
+        assertEquals(1, count);
+
+        files = localClient.list("", true);
+        assertNotNull(files);
+        assertTrue(files.size() >= 8);
+
+        files = localClient.list("test-local-client\\test", true);
+        assertEquals(1, files.size());
+        assertEquals("test", files.get(0).getRelativePath());
+
+        files = localClient.list("test-local-client\\dfsdfsfsdfs", true);
+        assertNotNull(files);
+        assertEquals(0, files.size());
     }
 }

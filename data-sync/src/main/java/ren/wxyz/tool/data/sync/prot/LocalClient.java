@@ -87,19 +87,14 @@ public class LocalClient {
         if (!p.exists()) {
             return files;
         }
-        if (p.isFile()) {
-            FileInfo fi = new FileInfo();
-            fi.setAbsolutePath(p.getAbsolutePath());
-            fi.setFilename(p.getName());
-            fi.setFileSize(p.length());
-            fi.setModifyDate(new Date(p.lastModified()));
-            fi.setFileType(getFileType(p));
-
-            files.add(fi);
-            return files;
-        }
         // 遍历目录下的文件
-        File[] filelist = p.listFiles();
+        File[] filelist;
+        if (p.isFile()) {
+            filelist = new File[] {p};
+        }
+        else {
+            filelist = p.listFiles();
+        }
 
         for (File f : filelist) {
             FileInfo fi = new FileInfo();
