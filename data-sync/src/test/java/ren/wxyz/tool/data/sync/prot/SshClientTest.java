@@ -25,8 +25,8 @@ public class SshClientTest {
 
     @BeforeClass
     public static void setUp() throws Exception {
-//        ssh = new SshClient("172.16.10.40", 22, "root", "iflytek!40", ".");
-        ssh = new SshClient("192.168.1.31", 22, "root", "123456", ".");
+        ssh = new SshClient("172.16.10.40", 22, "root", "iflytek!40", ".");
+//        ssh = new SshClient("192.168.1.31", 22, "root", "123456", ".");
         ssh.openSession();
     }
 
@@ -40,7 +40,7 @@ public class SshClientTest {
     public void testList() throws Exception {
         String workDir = "/root/data-service";
 
-        String path = "/root";
+        String path = "/root/data-service";
         List<FileInfo> files = ssh.list(path, true);
         printFileInfo(files, path);
 
@@ -48,7 +48,7 @@ public class SshClientTest {
         files = ssh.list(path, true);
         printFileInfo(files, path);
 
-        path = "uc.zip"; // TODO 有BUG
+        path = "uc.zip";
         files = ssh.list(path, true);
         printFileInfo(files, path);
 

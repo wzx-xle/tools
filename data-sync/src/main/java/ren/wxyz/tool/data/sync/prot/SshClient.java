@@ -202,24 +202,15 @@ public class SshClient {
      * @return 文件列表
      */
     private List<FileInfo> list(ChannelSftp sftp, final String path) {
+        // 判断路径是目录
+        boolean isDir = false;
         final List<FileInfo> files = new ArrayList<>();
         try {
             sftp.ls(path, new ChannelSftp.LsEntrySelector() {
-                private boolean isDir = false;
                 @Override
                 public int select(ChannelSftp.LsEntry entry) {
-                    if (entry.getFilename().equals(".") || entry.getFilename().equals("..")) {
-                        isDir = true;
-                        return 0;
-                    }
-
                     FileInfo info = new FileInfo();
-                    if (isDir) {
-                        info.setAbsolutePath(PathHelper.join("/", path, entry.getFilename()));
-                    }
-                    else {
-                        info.setAbsolutePath(path);
-                    }
+                    info.setAbsolutePath(PathHelper.join("/", path, entry.getFilename()));
                     info.setFilename(entry.getFilename());
                     info.setFileSize(entry.getAttrs().getSize());
                     info.setModifyDate(new Date(entry.getAttrs().getMTime() * 1000L));
@@ -229,6 +220,20 @@ public class SshClient {
                     return 0;
                 }
             });
+
+            // 移除.和..
+            Iterator<FileInfo> it = files.iterator();
+            while (it.hasNext()) {
+                FileInfo info = it.next();
+                if (info.getFilename().equals(".") || info.getFilename().equals("..")) {
+                    it.remove();
+                    isDir = true;
+                }
+            }
+            // 对于路径是文件的，重置绝对路径
+            if (!isDir) {
+                files.get(0).setAbsolutePath(path);
+            }
         }
         catch (SftpException e) {
             log.error("读取远程文件列表异常：{}, path={}", e.getMessage(), path);
