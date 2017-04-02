@@ -4,7 +4,7 @@
 
     <groupId>ren.wxyz.tool</groupId>
     <artifactId>tools</artifactId>
-    <version>1</version>
+    <version>1.0.0-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>${project.groupId}:${project.artifactId}</name>
@@ -13,8 +13,8 @@
 
     <licenses>
         <license>
-            <name>The Apache License, Version 2.0</name>
-            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <name>GNU General Public License v2.0</name>
+            <url>http://www.gnu.org/licenses/gpl-2.0.txt</url>
         </license>
     </licenses>
 
@@ -36,8 +36,8 @@
 
     <modules>
         <module>http-download</module>
-        <module>data-sync</module>
         <module>common-utils</module>
+        <module>launcher</module>
     </modules>
 
     <properties>
@@ -60,7 +60,7 @@
         <slf4j.version>1.7.7</slf4j.version>
         <log4j.version>1.2.17</log4j.version>
 
-        <common-utils.versino>1.0</common-utils.versino>
+        <tools.common-utils.version>1.0.0-SNAPSHOT</tools.common-utils.version>
     </properties>
 
     <dependencyManagement>
@@ -68,7 +68,7 @@
             <dependency>
                 <groupId>ren.wxyz.tool</groupId>
                 <artifactId>common-utils</artifactId>
-                <version>${common-utils.versino}</version>
+                <version>${tools.common-utils.version}</version>
             </dependency>
 
             <dependency>
