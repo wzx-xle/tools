@@ -4,7 +4,7 @@
  * This program can be distributed under the terms of the GNU GPL Version 2.
  * See the file LICENSE.
  */
-package ren.wxyz.tools.common.file;
+package ren.wxyz.tools.commons.file;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.SystemUtils;
