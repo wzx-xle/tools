@@ -7,7 +7,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>common-utils</artifactId>
+    <artifactId>commons</artifactId>
     <version>1.0.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
@@ -32,22 +32,4 @@
             </plugin>
         </plugins>
     </build>
-
-    <profiles>
-        <profile>
-            <id>dev</id>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
-            <properties>
-                <tools.common-utils.version>1.0.0-SNAPSHOT</tools.common-utils.version>
-            </properties>
-        </profile>
-        <profile>
-            <id>prod</id>
-            <properties>
-                <tools.common-utils.version>1.0.0</tools.common-utils.version>
-            </properties>
-        </profile>
-    </profiles>
 </project>
