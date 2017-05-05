@@ -6,11 +6,13 @@
  */
 package ren.wxyz.tools.launcher.ui;
 
+import javax.swing.*;
+
 /**
  * 主窗口
  *
  * @author wxyz 2017-04-26_21:03
  * @since 1.0
  */
-public class MainFrame {
+public class MainFrame extends JFrame {
 }
