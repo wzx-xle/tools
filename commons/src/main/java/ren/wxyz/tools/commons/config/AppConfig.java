@@ -36,6 +36,12 @@ public class AppConfig {
     private String name;
 
     /**
+     * 应用版本
+     */
+    @XStreamAsAttribute
+    private String version;
+
+    /**
      * 启动类
      */
     @XStreamAsAttribute

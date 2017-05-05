@@ -1,19 +1,21 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <apps>
+    <!-- 版本 -->
     <version>1.0</version>
 
-    <proxy name="local" protocol="SOCKS5">
+    <proxy name="local" enable="true">
+        <protocol>SOCKS5</protocol>
         <host>127.0.0.1</host>
         <port>1080</port>
     </proxy>
-    <proxy name="rasp_22" protocol="SOCKS5">
+    <proxy name="rasp_22">
+        <protocol>SOCKS5</protocol>
         <host>127.0.0.1</host>
         <port>1080</port>
     </proxy>
 
-    <app name="http-download" class="ren.wxyz.tools.http.download.App">
+    <app name="http-download" class="ren.wxyz.tools.http.download.App" version="1.0">
         <description>HTTP下载</description>
-        <param name="proxy" value="none" />
         <param name="outputFolder" value="outputdir/:date:" />
         <param name="downloadThreadNum" value="3" />
     </app>
