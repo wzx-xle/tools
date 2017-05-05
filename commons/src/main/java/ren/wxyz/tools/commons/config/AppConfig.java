@@ -101,4 +101,31 @@ public class AppConfig {
 
         params.add(param);
     }
+
+    /**
+     * 设置一个新参数
+     *
+     * @param name 名称
+     * @param value 值
+     */
+    public void setParam(String name, String value) {
+        if (StringUtils.isBlank(name)) {
+            return;
+        }
+
+        if (null == params) {
+            params = new ArrayList<>();
+        }
+        else {
+            // 找到就替换新值
+            for (ConfigParam p : params) {
+                if (name.equals(p.getName())) {
+                    p.setValue(value);
+                    return;
+                }
+            }
+        }
+
+        params.add(new ConfigParam(name, value));
+    }
 }

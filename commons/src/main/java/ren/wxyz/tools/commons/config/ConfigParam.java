@@ -17,6 +17,7 @@ import lombok.*;
  * @since 1.0
  */
 @Data
+@AllArgsConstructor
 @XStreamAlias("param")
 public class ConfigParam {
 
