@@ -7,6 +7,7 @@
 package ren.wxyz.tools.commons.config;
 
 import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.XStreamException;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamImplicit;
 import lombok.Getter;
@@ -32,6 +33,11 @@ import java.util.List;
 public class Configuration {
 
     /**
+     * 默认的配置路径
+     */
+    public static String DEFAULT_CONFIGUATION_FILE = "conf/app.xml";
+
+    /**
      * 缓存配置对象
      */
     private static Configuration configuration;
@@ -47,7 +53,14 @@ public class Configuration {
         XStream xStream = new XStream();
         xStream.processAnnotations(Configuration.class);
 
-        configuration = (Configuration) xStream.fromXML(new File(configPath));
+        try {
+            configuration = (Configuration) xStream.fromXML(new File(configPath));
+        }
+        catch (XStreamException e) {
+            log.warn("配置文件解析失败！{}", configPath);
+            log.warn("", e);
+        }
+
         return configuration;
     }
 
