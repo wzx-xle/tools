@@ -26,14 +26,14 @@ import java.util.List;
 @Setter
 @Getter
 @ToString
-@XStreamAlias("config")
+@XStreamAlias("app")
 public class AppConfig {
 
     /**
      * 应用名称
      */
     @XStreamAsAttribute
-    private String app;
+    private String name;
 
     /**
      * 启动类

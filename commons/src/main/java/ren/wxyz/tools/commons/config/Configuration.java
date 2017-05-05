@@ -28,7 +28,7 @@ import java.util.List;
 @Setter
 @Getter
 @Slf4j
-@XStreamAlias("configs")
+@XStreamAlias("apps")
 public class Configuration {
 
     /**
@@ -87,5 +87,11 @@ public class Configuration {
      * 应用配置
      */
     @XStreamImplicit
-    private List<AppConfig> configs;
+    private List<AppConfig> apps;
+
+    /**
+     * 应用程序版本
+     */
+    @XStreamAlias("version")
+    private String appVersion;
 }

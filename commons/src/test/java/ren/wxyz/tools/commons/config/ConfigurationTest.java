@@ -36,7 +36,7 @@ public class ConfigurationTest {
         assertEquals("SOCKS5", local.getProtocol());
         assertEquals("127.0.0.1", local.getHost());
 
-        assertNotNull(config.getConfigs());
+        assertNotNull(config.getApps());
 
 
     }
