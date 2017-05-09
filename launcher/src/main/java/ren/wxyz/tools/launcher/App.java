@@ -8,7 +8,13 @@ package ren.wxyz.tools.launcher;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.cli.*;
+import org.apache.log4j.PropertyConfigurator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import ren.wxyz.tools.commons.config.Configuration;
+import ren.wxyz.tools.launcher.ui.MainFrame;
+
+import java.awt.*;
 
 /**
  * 入口类
@@ -19,24 +25,23 @@ import ren.wxyz.tools.commons.config.Configuration;
 @Slf4j
 public class App {
 
+    private static final String APP_NAME = "java-tools";
+
     /**
      * 入口方法
      *
      * @param args
      */
     public static void main(String[] args) {
-        if (!cli(args)) {
-            return;
+        log.info("启动 {} 工具", APP_NAME);
+        if (cli(args)) {
+            start();
         }
-
-        System.out.println("Hello World!");
     }
 
     static void start() {
-        
+        EventQueue.invokeLater(() -> new MainFrame(APP_NAME).setVisible(true));
     }
-
-    private static Configuration config;
 
     /**
      * 解析命令参数
@@ -57,7 +62,7 @@ public class App {
             HelpFormatter hf = new HelpFormatter();
             // 帮助
             if (cmd.hasOption("h")) {
-                hf.printHelp("java-tools", opts);
+                hf.printHelp(APP_NAME, opts);
             }
             else {
                 // 配置文件

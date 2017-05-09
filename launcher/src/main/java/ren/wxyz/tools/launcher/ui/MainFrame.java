@@ -15,4 +15,10 @@ import javax.swing.*;
  * @since 1.0
  */
 public class MainFrame extends JFrame {
+
+    public MainFrame(String title) {
+        setTitle(title);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setSize(450, 250);
+    }
 }
