@@ -1,3 +1,3 @@
 @echo off
-cd ..
-javaw -cp .;lib/*;conf/ ren.wxyz.tools.launcher.App -c conf/app.xml
+
+start javaw -cp .;lib/* ren.wxyz.tools.launcher.App -c conf/app.xml

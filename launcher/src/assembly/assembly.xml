@@ -18,7 +18,7 @@
         </fileSet>
         <fileSet>
             <directory>src/scripts</directory>
-            <outputDirectory>/bin</outputDirectory>
+            <outputDirectory>/</outputDirectory>
             <includes>
                 <include>run.bat</include>
                 <include>run.sh</include>
@@ -28,8 +28,7 @@
             <directory>src/main/resources</directory>
             <outputDirectory>/conf</outputDirectory>
             <includes>
-                <include>app.properties</include>
-                <include>log4j.properties</include>
+                <include>app.xml</include>
             </includes>
         </fileSet>
         <fileSet>
