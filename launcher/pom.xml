@@ -33,6 +33,7 @@
                 <excludes>
                     <exclude>app.xml</exclude>
                 </excludes>
+                <filtering>true</filtering>
             </resource>
         </resources>
         <plugins>
@@ -64,4 +65,22 @@
             </plugin>
         </plugins>
     </build>
+
+    <profiles>
+        <profile>
+            <id>dev</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <properties>
+                <log4j>DEBUG, stdout</log4j>
+            </properties>
+        </profile>
+        <profile>
+            <id>prod</id>
+            <properties>
+                <log4j>INFO, stdout, dayRollingFile</log4j>
+            </properties>
+        </profile>
+    </profiles>
 </project>
