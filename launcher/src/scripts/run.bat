@@ -1,5 +1,3 @@
 @echo off
 cd ..
-java -cp .;lib/*;conf/ ren.wxyz.tools.launcher.App -c conf/app.properties
-
-pause ...
+javaw -cp .;lib/*;conf/ ren.wxyz.tools.launcher.App -c conf/app.xml

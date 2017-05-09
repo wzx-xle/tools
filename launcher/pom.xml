@@ -33,9 +33,6 @@
                 <excludes>
                     <exclude>app.xml</exclude>
                 </excludes>
-                <includes>
-                    <include>log4j.properties</include>
-                </includes>
             </resource>
         </resources>
         <plugins>
