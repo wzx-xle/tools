@@ -49,7 +49,10 @@ public class ConfigurationTest {
         assertEquals("127.0.0.1", rasp22.getHost());
 
         assertNotNull(config.getUseProxy());
-        assertEquals("local", config.getUseProxy());
+        assertEquals("local", config.getUseProxy().getName());
+
+        config.setUseProxy("rasp_22");
+        assertEquals("rasp_22", config.getUseProxy().getName());
 
         assertNotNull(config.getApps());
         assertEquals(1, config.getApps().size());
@@ -75,6 +78,8 @@ public class ConfigurationTest {
         Configuration.parse(readConfigPath);
         Configuration config = Configuration.getConfiguration();
         assertNotNull(config);
+
+        config.setUseProxy("rasp_22");
 
         config.setConfigPath(writeConfigPath);
         config.save();

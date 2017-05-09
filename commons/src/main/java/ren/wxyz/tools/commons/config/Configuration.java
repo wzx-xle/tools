@@ -124,4 +124,19 @@ public class Configuration {
      */
     @XStreamAlias("userProxy")
     private String useProxy;
+
+    /**
+     * 获取当前代理配置
+     *
+     * @return 代理配置信息
+     */
+    public ProxyConfig getUseProxy() {
+        for (ProxyConfig pc : proxies) {
+            if (this.useProxy.equals(pc.getName())) {
+                return pc;
+            }
+        }
+
+        return null;
+    }
 }
