@@ -10,6 +10,7 @@ import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.XStreamException;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamImplicit;
+import com.thoughtworks.xstream.annotations.XStreamOmitField;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -47,7 +48,7 @@ public class Configuration {
      *
      * @param configPath 配置文件路径
      */
-    public static Configuration parse(String configPath) {
+    public static synchronized void parse(String configPath) {
         log.debug("正在读取配置文件：{}", configPath);
 
         XStream xStream = new XStream();
@@ -60,24 +61,28 @@ public class Configuration {
             log.warn("配置文件解析失败！{}", configPath);
             log.warn("", e);
         }
+    }
 
+    /**
+     * 获取配置对象
+     *
+     * @return 配置对象
+     */
+    public static Configuration getConfiguration() {
         return configuration;
     }
 
     /**
      * 保存配置
-     *
-     * @param configPath 配置文件保存路径
      */
-    public static boolean save(String configPath) {
-        log.debug("正在写入配置文件：{}", configPath);
+    public synchronized boolean save() {
+        log.debug("正在写入配置文件：{}", configuration.getConfigPath());
         XStream xStream = new XStream();
         xStream.processAnnotations(Configuration.class);
-        xStream.autodetectAnnotations(true);
 
-        try (FileOutputStream fos = new FileOutputStream(configPath)){
+        try (FileOutputStream fos = new FileOutputStream(configuration.getConfigPath())){
+            fos.write("<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n".getBytes("UTF-8"));
             xStream.toXML(configuration, fos);
-
             return true;
         }
         catch (FileNotFoundException e) {
@@ -89,6 +94,12 @@ public class Configuration {
 
         return false;
     }
+
+    /**
+     * 配置文件路径
+     */
+    @XStreamOmitField
+    private String configPath;
 
     /**
      * 代理服务器列表
@@ -107,4 +118,10 @@ public class Configuration {
      */
     @XStreamAlias("version")
     private String appVersion;
+
+    /**
+     * 当前使用的代理
+     */
+    @XStreamAlias("userProxy")
+    private String useProxy;
 }

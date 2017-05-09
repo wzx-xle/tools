@@ -2,8 +2,9 @@
 <apps>
     <!-- 版本 -->
     <version>1.0</version>
+    <userProxy>local</userProxy>
 
-    <proxy name="local" enable="true">
+    <proxy name="local">
         <protocol>SOCKS5</protocol>
         <host>127.0.0.1</host>
         <port>1080</port>

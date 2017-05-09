@@ -31,12 +31,6 @@ public class ProxyConfig {
     private String name;
 
     /**
-     * 启用标志，为空也是不启用
-     */
-    @XStreamAsAttribute
-    private boolean enable;
-
-    /**
      * 代理服务器的访问协议
      */
     private String protocol;
