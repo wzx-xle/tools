@@ -39,8 +39,12 @@ public class App {
         }
     }
 
+    /**
+     * 启动
+     */
     static void start() {
-        EventQueue.invokeLater(() -> new MainFrame(APP_NAME).setVisible(true));
+        // 启动窗体
+        EventQueue.invokeLater(() -> new MainFrame(APP_NAME + "  v" + Configuration.getConfiguration().getAppVersion(), App::onWindowColsing));
     }
 
     /**
@@ -86,5 +90,12 @@ public class App {
         }
 
         return statusCode;
+    }
+
+    /**
+     * 窗口关闭后调用的方法
+     */
+    static void onWindowColsing() {
+        Configuration.getConfiguration().save();
     }
 }

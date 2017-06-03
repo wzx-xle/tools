@@ -6,7 +6,11 @@
  */
 package ren.wxyz.tools.launcher.ui;
 
+import ren.wxyz.tools.launcher.lambda.VoidFunction;
+
 import javax.swing.*;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 
 /**
  * 主窗口
@@ -16,9 +20,44 @@ import javax.swing.*;
  */
 public class MainFrame extends JFrame {
 
-    public MainFrame(String title) {
-        setTitle(title);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(450, 250);
+    /**
+     * 窗体的宽和高
+     */
+    private static final int FRAME_WIDTH = 650;
+    private static final int FRAME_HEIGHT = 450;
+
+    /**
+     * 窗口关闭回调
+     */
+    private final VoidFunction onWindowClosing;
+
+    /**
+     * 窗体启动构造器
+     *
+     * @param title 标题
+     */
+    public MainFrame(String title, VoidFunction onWindowClosing) {
+        this.setTitle(title);
+        this.setSize(FRAME_WIDTH, FRAME_HEIGHT);
+        this.setLocationRelativeTo(null);
+        initEventInvoke();
+
+        this.onWindowClosing = onWindowClosing;
+        this.setVisible(true);
+    }
+
+    /**
+     * 初始化事件调用
+     */
+    private void initEventInvoke() {
+        // 窗口事件处理
+        this.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                super.windowClosing(e);
+                onWindowClosing.invoke();
+                System.exit(0);
+            }
+        });
     }
 }

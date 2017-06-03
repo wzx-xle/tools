@@ -56,6 +56,7 @@ public class Configuration {
 
         try {
             configuration = (Configuration) xStream.fromXML(new File(configPath));
+            configuration.setConfigPath(configPath);
         }
         catch (XStreamException e) {
             log.warn("配置文件解析失败！{}", configPath);
