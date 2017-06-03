@@ -122,7 +122,7 @@ public class Configuration {
     /**
      * 当前使用的代理
      */
-    @XStreamAlias("userProxy")
+    @XStreamAlias("useProxy")
     private String useProxy;
 
     /**

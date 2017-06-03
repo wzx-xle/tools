@@ -2,7 +2,8 @@
 <apps>
     <!-- 版本 -->
     <version>1.0</version>
-    <userProxy>local</userProxy>
+    <!-- 全局代理配置 -->
+    <useProxy>local</useProxy>
 
     <proxy name="local">
         <protocol>SOCKS5</protocol>
