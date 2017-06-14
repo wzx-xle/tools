@@ -8,9 +8,6 @@ package ren.wxyz.tools.launcher;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.cli.*;
-import org.apache.log4j.PropertyConfigurator;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import ren.wxyz.tools.commons.config.Configuration;
 import ren.wxyz.tools.launcher.ui.MainFrame;
 
@@ -34,6 +31,7 @@ public class App {
      */
     public static void main(String[] args) {
         log.info("启动 {} 工具", APP_NAME);
+        // 解析参数成功后，启动程序
         if (cli(args)) {
             start();
         }
@@ -44,7 +42,9 @@ public class App {
      */
     static void start() {
         // 启动窗体
-        EventQueue.invokeLater(() -> new MainFrame(APP_NAME + "  v" + Configuration.getConfiguration().getAppVersion(), App::onWindowColsing));
+        EventQueue.invokeLater(() -> new MainFrame(
+                APP_NAME + "  v" + Configuration.getConfiguration().getAppVersion()
+                , App::onWindowColsing));
     }
 
     /**
@@ -54,7 +54,7 @@ public class App {
      * @return 控制流码
      */
     static boolean cli(String[] args) {
-        boolean statusCode = false;
+        boolean status = false;
 
         Options opts = new Options();
         opts.addOption("h", "help", false, "帮助信息");
@@ -79,7 +79,7 @@ public class App {
                     log.warn("没有指定配置文件，将启用默认的配置文件 {}", Configuration.DEFAULT_CONFIGUATION_FILE);
                 }
 
-                statusCode = true;
+                status = true;
             }
         }
         catch (ParseException e) {
@@ -89,7 +89,7 @@ public class App {
             log.error("额外异常", e);
         }
 
-        return statusCode;
+        return status;
     }
 
     /**
@@ -97,5 +97,6 @@ public class App {
      */
     static void onWindowColsing() {
         Configuration.getConfiguration().save();
+        log.info("停止 {} 工具", APP_NAME);
     }
 }
