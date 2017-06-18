@@ -2,7 +2,7 @@
 <apps>
     <!-- 版本 -->
     <version>1.0</version>
-    <userProxy>local</userProxy>
+    <useProxy>local</useProxy>
 
     <proxy name="local">
         <protocol>SOCKS5</protocol>
