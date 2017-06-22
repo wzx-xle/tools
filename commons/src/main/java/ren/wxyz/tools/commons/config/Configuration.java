@@ -48,7 +48,7 @@ public class Configuration {
      *
      * @param configPath 配置文件路径
      */
-    public static synchronized void parse(String configPath) {
+    public static synchronized boolean parse(String configPath) {
         log.debug("正在读取配置文件：{}", configPath);
 
         XStream xStream = new XStream();
@@ -57,10 +57,13 @@ public class Configuration {
         try {
             configuration = (Configuration) xStream.fromXML(new File(configPath));
             configuration.setConfigPath(configPath);
+
+            return true;
         }
         catch (XStreamException e) {
             log.warn("配置文件解析失败！{}", configPath);
             log.warn("", e);
+            return false;
         }
     }
 
