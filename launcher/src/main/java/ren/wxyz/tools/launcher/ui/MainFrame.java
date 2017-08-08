@@ -6,7 +6,9 @@
  */
 package ren.wxyz.tools.launcher.ui;
 
+import ren.wxyz.tools.commons.config.Configuration;
 import ren.wxyz.tools.launcher.lambda.VoidFunction;
+import ren.wxyz.tools.launcher.ui.proxy.ProxyMenuService;
 
 import javax.swing.*;
 import java.awt.*;
@@ -32,6 +34,8 @@ public class MainFrame extends JFrame {
      */
     private final VoidFunction onWindowClosing;
 
+    private ProxyMenuService proxyMenuService;
+
     /**
      * 窗体启动构造器
      *
@@ -55,19 +59,39 @@ public class MainFrame extends JFrame {
     private void initMenu() {
         // 菜单条
         JMenuBar menuBar = new JMenuBar();
-        this.setJMenuBar(menuBar);
 
-        // 文件菜单
+        /**
+         * 文件菜单
+         */
         JMenu file = new JMenu("文件");
         menuBar.add(file);
 
-        // 设置菜单
+        /**
+         * 设置菜单
+         */
         JMenu settings = new JMenu("设置");
+
+        // 代理菜单
+        JMenu proxySettings = new JMenu("代理");
+        proxyMenuService = new ProxyMenuService(proxySettings, Configuration.getConfiguration());
+        proxyMenuService.initOptionsMenu()
+                .addSeparator()
+                .initOperateMenu();
+
+        settings.add(proxySettings);
+
+        JMenuItem config = new JMenuItem("配置");
+        settings.add(config);
+
         menuBar.add(settings);
 
-        // 帮助菜单
+        /**
+         * 帮助菜单
+         */
         JMenu help = new JMenu("帮助");
         menuBar.add(help);
+
+        this.setJMenuBar(menuBar);
     }
 
     /**
@@ -86,6 +110,7 @@ public class MainFrame extends JFrame {
 
         // 全局设置
         JPanel globalSettings = new JPanel();
+//        globalSettings.setOpaque(false);
         tabbedPane.add("全局设置", globalSettings);
 
         for (String name : new String[] {"测试1", "测试2", "测试2", "测试2", "测试2", "测试2"}) {
