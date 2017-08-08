@@ -9,6 +9,7 @@ package ren.wxyz.tools.launcher;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.cli.*;
 import ren.wxyz.tools.commons.config.Configuration;
+import ren.wxyz.tools.launcher.lambda.VoidFunction;
 import ren.wxyz.tools.launcher.ui.MainFrame;
 
 import java.awt.*;
@@ -47,9 +48,18 @@ public class App {
      */
     static void start() {
         // 启动窗体
-        EventQueue.invokeLater(() -> new MainFrame(
-                APP_NAME + "  v" + Configuration.getConfiguration().getAppVersion()
-                , App::onWindowColsing));
+        EventQueue.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                new MainFrame(APP_NAME + "  v" + Configuration.getConfiguration().getAppVersion()
+                        , new VoidFunction() {
+                    @Override
+                    public void invoke() {
+                        App.onWindowColsing();
+                    }
+                });
+            }
+        });
     }
 
     /**
