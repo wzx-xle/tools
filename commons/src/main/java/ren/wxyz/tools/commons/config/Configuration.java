@@ -134,7 +134,7 @@ public class Configuration {
      *
      * @return 代理配置信息
      */
-    public ProxyConfig getUseProxy() {
+    public ProxyConfig getUsingProxy() {
         for (ProxyConfig pc : proxies) {
             if (this.useProxy.equals(pc.getName())) {
                 return pc;

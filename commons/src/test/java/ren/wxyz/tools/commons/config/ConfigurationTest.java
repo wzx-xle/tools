@@ -49,10 +49,12 @@ public class ConfigurationTest {
         assertEquals("127.0.0.1", rasp22.getHost());
 
         assertNotNull(config.getUseProxy());
-        assertEquals("local", config.getUseProxy().getName());
+        assertEquals("local", config.getUseProxy());
+        assertEquals("local", config.getUsingProxy().getName());
 
         config.setUseProxy("rasp_22");
-        assertEquals("rasp_22", config.getUseProxy().getName());
+        assertEquals("rasp_22", config.getUseProxy());
+        assertEquals("rasp_22", config.getUsingProxy().getName());
 
         assertNotNull(config.getApps());
         assertEquals(1, config.getApps().size());
