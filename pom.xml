@@ -35,9 +35,10 @@
     </scm>
 
     <modules>
-        <module>http-download</module>
         <module>commons</module>
         <module>launcher</module>
+        <module>content-search</module>
+        <module>http-download</module>
     </modules>
 
     <properties>
@@ -59,8 +60,6 @@
         <lombok.version>1.16.6</lombok.version>
         <slf4j.version>1.7.7</slf4j.version>
         <log4j.version>1.2.17</log4j.version>
-
-        <tools.commons.version>1.0.0-SNAPSHOT</tools.commons.version>
     </properties>
 
     <dependencyManagement>
@@ -68,7 +67,7 @@
             <dependency>
                 <groupId>ren.wxyz.tools</groupId>
                 <artifactId>commons</artifactId>
-                <version>${tools.commons.version}</version>
+                <version>1.0.0-SNAPSHOT</version>
             </dependency>
 
             <dependency>
@@ -255,6 +254,15 @@
                     <source>${java.version}</source>
                     <target>${java.version}</target>
                     <encoding>${project.build.sourceEncoding}</encoding>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <forkMode>once</forkMode>
+                    <argLine>-Dfile.encoding=UTF-8</argLine>
                 </configuration>
             </plugin>
         </plugins>

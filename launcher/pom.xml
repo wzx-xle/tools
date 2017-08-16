@@ -18,6 +18,12 @@
     </properties>
 
     <dependencies>
+        <!-- 公共依赖包 -->
+        <dependency>
+            <groupId>ren.wxyz.tools</groupId>
+            <artifactId>commons</artifactId>
+        </dependency>
+
         <dependency>
             <groupId>ren.wxyz.tools</groupId>
             <artifactId>http-download</artifactId>
