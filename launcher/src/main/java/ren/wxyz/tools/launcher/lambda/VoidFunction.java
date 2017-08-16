@@ -12,7 +12,6 @@ package ren.wxyz.tools.launcher.lambda;
  * @author wxyz 2017-06-03_13:17
  * @since 1.0
  */
-@FunctionalInterface
 public interface VoidFunction {
     /**
      * 调用
