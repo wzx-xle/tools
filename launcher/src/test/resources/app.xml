@@ -16,9 +16,13 @@
         <port>1080</port>
     </proxy>
 
-    <app name="http-download" class="ren.wxyz.tools.http.download.App" version="1.0">
-        <description>HTTP下载</description>
-        <param name="outputFolder" value="outputdir/:date:" />
-        <param name="downloadThreadNum" value="3" />
+    <!--<app name="http-download" class="ren.wxyz.tools.http.download.App" version="1.0">-->
+        <!--<description>HTTP下载</description>-->
+        <!--<param name="outputFolder" value="outputdir/:date:" />-->
+        <!--<param name="downloadThreadNum" value="3" />-->
+    <!--</app>-->
+
+    <app name="content-search" class="ren.wxyz.tools.content.search.App" version="1.0">
+        <description>内容查询</description>
     </app>
 </apps>

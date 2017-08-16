@@ -6,14 +6,25 @@
  */
 package ren.wxyz.tools.launcher.ui;
 
+import ren.wxyz.tools.commons.bean.ObjectHelper;
+import ren.wxyz.tools.commons.config.AppConfig;
 import ren.wxyz.tools.commons.config.Configuration;
 import ren.wxyz.tools.launcher.lambda.VoidFunction;
 import ren.wxyz.tools.launcher.ui.proxy.ProxyMenuService;
 
 import javax.swing.*;
+import javax.swing.event.AncestorEvent;
+import javax.swing.event.AncestorListener;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.util.*;
+import java.util.List;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * 主窗口
@@ -34,6 +45,9 @@ public class MainFrame extends JFrame {
      */
     private final VoidFunction onWindowClosing;
 
+    /**
+     * 代理菜单处理服务
+     */
     private ProxyMenuService proxyMenuService;
 
     /**
@@ -100,23 +114,36 @@ public class MainFrame extends JFrame {
     private JTabbedPane tabbedPane;
 
     /**
+     * 应用列表
+     */
+    private List<JPanel> apps = new ArrayList<>();
+
+    private List<Dimension> appSizes = new ArrayList<>();
+
+    /**
+     * 线程池
+     */
+    private ExecutorService threadPool = Executors.newFixedThreadPool(3);
+
+    /**
      * 初始化选项卡
      */
     private void initTabbedPanel() {
         tabbedPane = new JTabbedPane(JTabbedPane.NORTH);
         tabbedPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
-//        tabbedPane.addT
         this.add(tabbedPane, BorderLayout.CENTER);
 
-        // 全局设置
-        JPanel globalSettings = new JPanel();
-//        globalSettings.setOpaque(false);
-        tabbedPane.add("全局设置", globalSettings);
-
-        for (String name : new String[] {"测试1", "测试2", "测试2", "测试2", "测试2", "测试2"}) {
-            JPanel panel = new JPanel();
-            tabbedPane.add(name, panel);
+        // 加载App
+        for (final AppConfig app : Configuration.getConfiguration().getApps()) {
+            JPanel panel = ObjectHelper.getInstance(app.getClz(), app);
+            tabbedPane.add(app.getName(), panel);
+            apps.add(panel);
+            appSizes.add(panel.getSize());
+            System.out.println("width:" + panel.getWidth() + ", height:" + panel.getHeight());
         }
+
+        // 初始化窗口大小
+        changeWindowSizeByTabbedPane();
     }
 
     /**
@@ -132,5 +159,27 @@ public class MainFrame extends JFrame {
                 System.exit(0);
             }
         });
+
+        // 监听选项卡切换事件
+        tabbedPane.addChangeListener(new ChangeListener() {
+            @Override
+            public void stateChanged(ChangeEvent e) {
+                changeWindowSizeByTabbedPane();
+            }
+        });
+    }
+
+    /**
+     * 根据选项卡大小调整窗口大小
+     */
+    private void changeWindowSizeByTabbedPane() {
+        Dimension size = appSizes.get(tabbedPane.getSelectedIndex());
+
+        if (size.getHeight() <= 10 || size.getWidth() <= 10) {
+            setSize(FRAME_WIDTH, FRAME_HEIGHT);
+            return;
+        }
+
+        setSize((int) size.getWidth() + 21, (int) size.getHeight() + 90);
     }
 }
