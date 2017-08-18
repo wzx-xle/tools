@@ -84,6 +84,7 @@ public class MainFrame extends JFrame {
          * 设置菜单
          */
         JMenu settings = new JMenu("设置");
+        menuBar.add(settings);
 
         // 代理菜单
         JMenu proxySettings = new JMenu("代理");
@@ -96,8 +97,6 @@ public class MainFrame extends JFrame {
 
         JMenuItem config = new JMenuItem("配置");
         settings.add(config);
-
-        menuBar.add(settings);
 
         /**
          * 帮助菜单
