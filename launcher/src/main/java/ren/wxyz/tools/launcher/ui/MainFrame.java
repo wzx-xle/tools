@@ -118,6 +118,9 @@ public class MainFrame extends JFrame {
      */
     private List<JPanel> apps = new ArrayList<>();
 
+    /**
+     * 应用大小与存储
+     */
     private List<Dimension> appSizes = new ArrayList<>();
 
     /**
