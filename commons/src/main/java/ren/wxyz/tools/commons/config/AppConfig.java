@@ -49,6 +49,12 @@ public class AppConfig {
     private String clz;
 
     /**
+     * 应用可用
+     */
+    @XStreamAsAttribute
+    private Boolean enabled;
+
+    /**
      * 应用描述
      */
     private String description;
@@ -58,6 +64,19 @@ public class AppConfig {
      */
     @XStreamImplicit
     private List<ConfigParam> params;
+
+    /**
+     * 获取可用状态
+     *
+     * @return 可用状态
+     */
+    public boolean getEnabled() {
+        if (this.enabled == null) {
+            return true;
+        }
+
+        return this.enabled;
+    }
 
     /**
      * 获取一个配置参数

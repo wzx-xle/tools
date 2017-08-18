@@ -57,7 +57,7 @@ public class ConfigurationTest {
         assertEquals("rasp_22", config.getUsingProxy().getName());
 
         assertNotNull(config.getApps());
-        assertEquals(1, config.getApps().size());
+        assertEquals(2, config.getApps().size());
 
         List<AppConfig> apps = config.getApps();
 
@@ -67,9 +67,21 @@ public class ConfigurationTest {
         assertEquals("http-download", httpDownload.getName());
         assertEquals("ren.wxyz.tools.http.download.App", httpDownload.getClz());
         assertEquals("1.0", httpDownload.getVersion());
+        assertTrue(httpDownload.getEnabled());
         assertEquals("HTTP下载", httpDownload.getDescription());
         assertEquals("outputdir/:date:", httpDownload.getParam("outputFolder").getValue());
         assertEquals("3", httpDownload.getParam("downloadThreadNum").getValue());
+
+        // 第二个应用配置
+        AppConfig httpDownload2 = apps.get(1);
+        assertNotNull(httpDownload2);
+        assertEquals("http-download2", httpDownload2.getName());
+        assertEquals("ren.wxyz.tools.http.download.App", httpDownload2.getClz());
+        assertEquals("1.0", httpDownload2.getVersion());
+        assertFalse(httpDownload2.getEnabled());
+        assertEquals("HTTP下载", httpDownload2.getDescription());
+        assertEquals("outputdir/:date:", httpDownload2.getParam("outputFolder").getValue());
+        assertEquals("3", httpDownload2.getParam("downloadThreadNum").getValue());
     }
 
     @Test

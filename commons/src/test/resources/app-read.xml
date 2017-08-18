@@ -20,4 +20,10 @@
         <param name="outputFolder" value="outputdir/:date:" />
         <param name="downloadThreadNum" value="3" />
     </app>
+
+    <app name="http-download2" class="ren.wxyz.tools.http.download.App" version="1.0" enabled="false">
+        <description>HTTP下载</description>
+        <param name="outputFolder" value="outputdir/:date:" />
+        <param name="downloadThreadNum" value="3" />
+    </app>
 </apps>
