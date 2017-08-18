@@ -137,13 +137,7 @@ public class MainFrame extends JFrame {
         this.add(tabbedPane, BorderLayout.CENTER);
 
         // 加载App
-        for (final AppConfig app : Configuration.getConfiguration().getApps()) {
-            JPanel panel = ObjectHelper.getInstance(app.getClz(), app);
-            tabbedPane.add(app.getName(), panel);
-            apps.add(panel);
-            appSizes.add(panel.getSize());
-            System.out.println("width:" + panel.getWidth() + ", height:" + panel.getHeight());
-        }
+        loadApps();
 
         // 初始化窗口大小
         changeWindowSizeByTabbedPane();
@@ -184,5 +178,21 @@ public class MainFrame extends JFrame {
         }
 
         setSize((int) size.getWidth() + 21, (int) size.getHeight() + 90);
+    }
+
+    /**
+     * 加载应用
+     */
+    private void loadApps() {
+        for (AppConfig app : Configuration.getConfiguration().getApps()) {
+            // 跳过取消的
+            if (!app.getEnabled()) {
+                continue;
+            }
+            JPanel panel = ObjectHelper.getInstance(app.getClz(), app);
+            tabbedPane.add(app.getName(), panel);
+            apps.add(panel);
+            appSizes.add(panel.getSize());
+        }
     }
 }
