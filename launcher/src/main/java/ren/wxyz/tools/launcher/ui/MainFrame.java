@@ -18,8 +18,7 @@ import javax.swing.event.AncestorListener;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import java.awt.*;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
+import java.awt.event.*;
 import java.util.*;
 import java.util.List;
 import java.util.concurrent.Executor;
@@ -99,6 +98,24 @@ public class MainFrame extends JFrame {
         settings.add(config);
 
         /**
+         * 应用菜单
+         */
+        JMenu app = new JMenu("应用");
+        menuBar.add(app);
+
+        // 重载
+        JMenuItem reloadAppsItem = new JMenuItem("重载");
+        app.add(reloadAppsItem);
+        reloadAppsItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                removeApps();
+                loadApps();
+            }
+        });
+
+
+        /**
          * 帮助菜单
          */
         JMenu help = new JMenu("帮助");
@@ -169,8 +186,15 @@ public class MainFrame extends JFrame {
      * 根据选项卡大小调整窗口大小
      */
     private void changeWindowSizeByTabbedPane() {
+        // 没用应用时，直接返回
+        if (apps.size() == 0) {
+            return;
+        }
+
+        // 获取对应用的大小
         Dimension size = appSizes.get(tabbedPane.getSelectedIndex());
 
+        // 过小时，不同步设置到应用大小
         if (size.getHeight() <= 10 || size.getWidth() <= 10) {
             setSize(FRAME_WIDTH, FRAME_HEIGHT);
             return;
@@ -193,5 +217,14 @@ public class MainFrame extends JFrame {
             apps.add(panel);
             appSizes.add(panel.getSize());
         }
+    }
+
+    /**
+     * 移除所有应用
+     */
+    private void removeApps() {
+        apps.clear();
+        appSizes.clear();
+        tabbedPane.removeAll();
     }
 }
